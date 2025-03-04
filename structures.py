@@ -36,20 +36,29 @@ class Matrix(Generic[T]):
         if c not in range(0, self._cols):
             raise IndexError(f"c = {c} is out of range of matrix")
 
-    def get(self, r: int, c: int) -> T:
+    def get_mutable(self, r: int, c: int) -> T:
         """
+        Named 'get_mutable' to ensure the idea that this returns a reference to
+        the object
         :return: mutable instance of element
         """
         self._check_bounds(r, c)
         return self._board[r][c]
 
     def get_copy(self, r: int, c: int) -> T:
-        return copy.deepcopy(self.get(r, c))
+        """
+        Returns a copy which is safe to mutate, preserving the original value
+        :return: copy instance of element
+        """
+        return copy.deepcopy(self.get_mutable(r, c))
 
     def set(self, r: int, c: int, value: T):
         self._check_bounds(r, c)
         self._board[r][c] = value
 
+    # Dunders
+    def __repr__(self):
+        return str([f'i={i}: [{" ".join([repr(e) for e in row])}]' for i, row in enumerate(self._board)])
 
 # Classes imported from *
 __all__ = [
