@@ -1,26 +1,35 @@
 import copy
-from typing import TypeVar, Generic, Type
+from typing import TypeVar, Generic, Type, Callable
 
 T = TypeVar('T')
 
-class Matrix(Generic[T]):
-    def __init__(self, cls: Type[T], *, rows: int, cols: int):
-        """
-        Constructs an instance of a matrix with the default initializer of the
-        requested generic class.
 
-        :param cls: name of class which this matrix should use
-        :param rows: number of rows in matrix. Should be greater than 0
-        :param cols: number of columns in matrix. Should be greater than 0
+class Matrix(Generic[T]):
+    """
+    Representation of a 2D array in the form of a matrix
+
+    Note:
+        The matrix is initialized using a callable initializer function, allowing for greater
+        flexibility in object creation. This avoids limitations related to requiring a default
+        constructor for the generic type.
+    """
+
+    def __init__(self, *, rows: int, cols: int, initializer: Callable[[], T]):
+        """
+        Constructs an instance of a matrix with elements initialized by the provided initializer function.
+
+        :param initializer: A callable that returns an instance of the desired type when invoked.
+        :param rows: Number of rows in the matrix. Should be greater than 0.
+        :param cols: Number of columns in the matrix. Should be greater than 0.
         """
         if rows <= 0:
             raise ValueError(f'rows should be greater than 0, not {rows}')
         if cols <= 0:
             raise ValueError(f'cols should be greater than 0, not {cols}')
-        self._cls = cls
+
         self._rows = rows
         self._cols = cols
-        self._board = [[cls() for _ in range(0, self._cols)] for _ in range(0, self._rows)]
+        self._board = [[initializer() for _ in range(self._cols)] for _ in range(self._rows)]
 
     @property
     def rows(self) -> int:
@@ -59,6 +68,7 @@ class Matrix(Generic[T]):
     # Dunders
     def __repr__(self):
         return str([f'i={i}: [{" ".join([repr(e) for e in row])}]' for i, row in enumerate(self._board)])
+
 
 # Classes imported from *
 __all__ = [
