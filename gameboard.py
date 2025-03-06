@@ -74,3 +74,11 @@ class Board:
             match_found = self._match_rule.check_matches(self)
         if self._generator_rule is not None:
             generated_tile = self._generator_rule.produce_tiles(self)
+
+    
+    def get_rows(self):
+        return self._tiles.rows
+    
+    def get_cols(self):
+        return self._tiles.cols
+    
