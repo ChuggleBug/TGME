@@ -9,8 +9,19 @@ from gameboard import Coordinate, GameElement
 
 if TYPE_CHECKING:
     from typing import Optional, Union
-    from gameboard import Board, ElementSet
+    from gameboard import Board, BoardElementSet
     from button_controller import DirectionButton, ActionButton
+
+
+class ElementGenerationFailException(BaseException):
+    """
+    Exception to be raised in the event when a tile is supposed to
+    be generated, but fails to fit inside the board. This typically
+    happens in games where tiles are actively made (and the player)
+    needs to organize them, compared to passive generation where
+    tiles tend to be an effect of player actions
+    """
+    pass
 
 
 # Don't Use. Will ask professor about how to use this design pattern
@@ -40,7 +51,7 @@ class TileMatchRule(ABC):
     """
 
     @abstractmethod
-    def check_matches(self, board: Board) -> Optional[ElementSet]:
+    def check_matches(self, board: Board) -> Optional[BoardElementSet]:
         """
         A single rule to check for a match on a board
         :param board: The board to check
@@ -50,11 +61,9 @@ class TileMatchRule(ABC):
         ...
 
 
-# TODO: Should this return an Iterable consisting of where the tiles
-# TODO: were place, or just directly modify the board itself (or both)?
 class TileGeneratorRule(ABC):
     """
-    An interface defining a board should try to generate new tile on a single game tick
+    An interface defining how a board should try to generate new tile on a single game tick
 
     Implementing classes must define the `produce_tiles` method, which evaluates
     the coordinates of where new tiles can be placed on the board
@@ -67,9 +76,15 @@ class TileGeneratorRule(ABC):
         This rule is only responsible for placing new tiles on the board. It does not
         dictate what happens after tiles are produced as that should be
         handled by another rule.
+        In some cases, whether a board has an active tile or not might affect the state of the
+        generator rule. This is typically the case for generators which actively make tiles.
+        Additionally, depending on the rule, this might throw a ElementGenerationFailException
+        in the event where an element set is supposed to generate, but is unable
+        to do so.
+
     """
     @abstractmethod
-    def produce_tiles(self, board: Board) -> Optional[ElementSet]:
+    def produce_tiles(self, board: Board) -> Optional[BoardElementSet]:
         """
         A single rule to determine where to place tiles on a board
 
@@ -97,8 +112,6 @@ class FillEmptySpots(TileGeneratorRule):
 class UserInputRule(ABC):
     """
     A single rule to determine how the board will handle user input
-
-    A rule is given a
     """
 
     @abstractmethod

@@ -16,11 +16,6 @@ class ActionButton(Enum):
 
 
 class ButtonController(ABC):
-    """
-    Note:
-        One limitation is that a set of inputs cannot bind to both direction buttons
-        and action buttons. This means that a set
-    """
     def __init__(self):
         self._direction_fn_map: dict[DirectionButton, Callable[[DirectionButton], Any]] = {}
         self._action_fn_map: dict[ActionButton, Callable[[ActionButton], Any]] = {}
