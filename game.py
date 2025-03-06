@@ -34,6 +34,7 @@ class Game:
     
     def render_board(self):
         cell_size = 100
+        color_map = {"R": "red", "G": "green", "B": "blue", "Y": "yellow", "P": "purple"}
         for row in range(self._board.get_rows()):
             for col in range(self._board.get_cols()):
                 x1 = row * cell_size
@@ -43,6 +44,12 @@ class Game:
 
                 self.canvas.create_rectangle(x1, y1, x2, y2, outline="white", width=3)
 
+                tile_element = self._board._tiles.get_copy(row, col)
+                if tile_element and tile_element._elements:
+                    print(f"Tile at ({row}, {col}): {tile_element._elements[0]}")
+                    tile_color = color_map.get(tile_element._elements[0].type, "white")
+                    self.canvas.create_rectangle(x1, y1, x2, y2, fill=tile_color, outline="white", width=3)
+
 
 
     def get_window(self):
@@ -50,4 +57,6 @@ class Game:
 
     def start(self):
         self._controller.start_controller()
+        self._board.spawn_tiles()
+        self.render_board()
         self._window.mainloop()

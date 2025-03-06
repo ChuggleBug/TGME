@@ -2,7 +2,10 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
+import random
 from typing import TYPE_CHECKING
+
+from gameboard import Coordinate, GameElement
 
 if TYPE_CHECKING:
     from typing import Optional, Union
@@ -77,6 +80,19 @@ class TileGeneratorRule(ABC):
         :return: A sequence of tiles which were placed, None otherwise
         """
         ...
+
+class FillEmptySpots(TileGeneratorRule):
+    def produce_tiles(self, board: Board) -> Optional[ElementSet]:
+        generated_tiles = ElementSet()
+        for row in range(board.get_rows()):
+            for col in range(board.get_cols()):
+                tile = board._tiles.get_copy(row, col)
+                if tile.is_empty():
+                    new_tile = GameElement(type_=random.choice(["R", "G", "B", "Y"]))
+                    tile._elements.append(new_tile)
+                    generated_tiles.add_element(new_tile, Coordinate(row, col))
+                #print(f"{tile._elements[0].type} ({row}, {col})")
+        return generated_tiles if len(generated_tiles.get_elements()) > 0 else None
 
 class UserInputRule(ABC):
     """

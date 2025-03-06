@@ -20,7 +20,8 @@ class UserInputRuleSet(NamedTuple):
     input_set: Set[DirectionButton | ActionButton]
 
 class GameElement:
-    pass
+    def __init__(self, type: str):
+        self._type = type
 
 
 class TileElement:
@@ -79,6 +80,11 @@ class Board:
         if self._generator_rule is not None:
             generated_tile = self._generator_rule.produce_tiles(self)
 
+    def spawn_tiles(self):
+        if self._generator_rule:
+            generated_tiles = self._generator_rule.produce_tiles(self)
+            if generated_tiles:
+                print(f"Generated {len(generated_tiles.get_elements())} tiles")
     
     def get_rows(self):
         return self._tiles.rows
