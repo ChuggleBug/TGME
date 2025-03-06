@@ -22,7 +22,7 @@ class Game:
         self._board = board
         self._controller = controller
 
-
+        
         self.render_board()
         for ruleset in board.get_user_input_rules():
             # Defined here for debugging purposes
@@ -36,9 +36,9 @@ class Game:
         cell_size = 100
         for row in range(self._board.get_rows()):
             for col in range(self._board.get_cols()):
-                x1 = col * cell_size
+                x1 = row * cell_size
                 x2 = x1 + cell_size
-                y1 = row * cell_size
+                y1 = col * cell_size
                 y2 = y1 + cell_size
 
                 self.canvas.create_rectangle(x1, y1, x2, y2, outline="white", width=3)

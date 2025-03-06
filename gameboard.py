@@ -40,12 +40,16 @@ class ElementSet:
 
 
 class Board:
-    def __init__(self, *, rows: int, cols: int):
+    def __init__(self, rows: int, cols: int, player_id: int):
         self._tiles: Matrix[TileElement] = Matrix(rows=rows, cols=cols, initializer=lambda: TileElement())
         self._match_rule: Optional[TileMatchRule] = None
         self._generator_rule: Optional[TileGeneratorRule] = None
         self._live_tiles: Optional[ElementSet] = None
         self._input_rules: List[UserInputRuleSet] = []
+        self._player_id = player_id
+
+    def get_player_id(self):
+       return self._player_id
 
     def get_live_tiles(self) -> Optional[ElementSet]:
         return self._live_tiles

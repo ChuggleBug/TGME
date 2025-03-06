@@ -86,3 +86,6 @@ class KeyboardController(ButtonController):
             raise StateError("Controller was not bound to a window")
 
         self._window.bind("<KeyPress>", self._handle_button_event)
+
+
+# create another keyboard controller for player 2 like WASD instead of up, down, left and right
