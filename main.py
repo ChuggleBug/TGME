@@ -1,4 +1,4 @@
-
+from generator_rules import FillAllSpots
 from rules import *
 from game import Game
 from button_controller import KeyboardController, DirectionButton, ActionButton
@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
     # Set rules dictating what happens for user input
     board.set_tile_match_rule(TestTileMatch())
-    board.set_tile_generator_rule(FillEmptySpots())
+    board.set_tile_generator_rule(FillAllSpots())
     board.add_user_input_rule(UpDownInput(), {DirectionButton.UP, DirectionButton.DOWN})
     board.add_user_input_rule(LeftRightInput(), {DirectionButton.LEFT, DirectionButton.RIGHT}) # board will perform rule for these set of inputs
     board.add_user_input_rule(ActionInput(), {ActionButton.PRIMARY, ActionButton.SECONDARY})
