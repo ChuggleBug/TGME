@@ -1,4 +1,4 @@
-from gameboard import Board, Coordinate
+from board import Board, Coordinate
 from rules import TileMovementRule
 from enum import Enum, auto
 

@@ -5,12 +5,12 @@ from typing import TYPE_CHECKING
 import tkinter as tk
 
 from button_controller import ButtonController
-from gameboard import Coordinate
+from board import Coordinate
 from constants import TK_COLOR_MAP
 
 if TYPE_CHECKING:
     from typing import Optional
-    from gameboard import Board
+    from board import Board
 
 
 # TODO: Implement support for two players

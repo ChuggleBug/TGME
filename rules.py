@@ -3,11 +3,12 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NamedTuple, Set
 
 if TYPE_CHECKING:
     from typing import Optional, Union
-    from gameboard import Board, BoardElementSet
+    from board import Board
+    from board_elements import BoardElementSet
     from button_controller import DirectionButton, ActionButton
     from shift_rules import ShiftDirection
 
@@ -108,6 +109,11 @@ class UserInputRule(ABC):
     @abstractmethod
     def handle_input(self, board: Board, *, event: Union[DirectionButton, ActionButton]):
         ...
+
+
+class UserInputRuleSet(NamedTuple):
+    input_rule: UserInputRule
+    input_set: Set[DirectionButton | ActionButton]
 
 
 class TileMovementRule(ABC):

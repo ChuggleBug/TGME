@@ -5,7 +5,8 @@ from generator_rules import FillAllSpotsRule, FillEmptyTopRowSpotsRule, DropElem
 from rules import UserInputRule, TileMatchRule
 from game import Game
 from button_controller import KeyboardController, DirectionButton, ActionButton
-from gameboard import Board, GameElement, Coordinate, BoardElementSet, RelativeElementSet
+from board import Board, Coordinate
+from board_elements import RelativeElementSet, BoardElementSet, GameElement
 from provider import WeightedRandomElementProvider, UniformRandomElementProvider
 from constants import Color
 
@@ -102,9 +103,9 @@ if __name__ == "__main__":
 
     # Set rules dictating what happens for user input
     board.set_tile_match_rule(TestTileMatch())
-    board.add_user_input_rule(UpDownInput(), {DirectionButton.UP, DirectionButton.DOWN})
-    board.add_user_input_rule(LeftRightInput(), {DirectionButton.LEFT, DirectionButton.RIGHT}) # board will perform rule for these set of inputs
-    board.add_user_input_rule(ActionInput(), {ActionButton.PRIMARY, ActionButton.SECONDARY})
+    board.add_user_input_rule(UpDownInput(), input_set={DirectionButton.UP, DirectionButton.DOWN})
+    board.add_user_input_rule(LeftRightInput(), input_set={DirectionButton.LEFT, DirectionButton.RIGHT}) # board will perform rule for these set of inputs
+    board.add_user_input_rule(ActionInput(), input_set={ActionButton.PRIMARY, ActionButton.SECONDARY})
 
     # Associated input rules for the board will now be executed from the associated controller
     game.bind(controller, board)

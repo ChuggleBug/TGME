@@ -2,12 +2,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from gameboard import Board, RelativeElementSet, BoardElementSet, Coordinate
+from board import Board, Coordinate
+from board_elements import RelativeElementSet, BoardElementSet, GameElement
 from provider import ElementProvider
 from rules import TileGeneratorRule, ElementGenerationFailException
 
 if TYPE_CHECKING:
-    from gameboard import GameElement
     from typing import Optional
 
 
