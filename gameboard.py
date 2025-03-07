@@ -14,8 +14,8 @@ if TYPE_CHECKING:
     from button_controller import DirectionButton, ActionButton
     from rules import *
 
-
-class Coordinate(NamedTuple):
+@dataclass
+class Coordinate:
     x: int
     y: int
 
@@ -38,12 +38,14 @@ class GameElement(ABC):
     in a single instance of a complete game, not every single attribute
     will be used
     """
+    # Name of the element (useful for debugging sometimes)
+    element_name: str = field(default='GameElementDefault')
     # Elements can spawn on top of this element
     supports_tile_spawn: bool = field(default=False)
     # This element's color has a meaning
     supports_color: bool = field(default=True)
     # The element's color. Only useful if supports_color is True
-    element_color: Color = field(default=Color.WHITE)
+    element_color: Color = field(default=Color.DEFAULT)
     # A single element can move around and is not locked to the tile
     support_tile_move: bool = field(default=True)
 
@@ -71,15 +73,26 @@ class TileElement:
     def has_elements(self) -> bool:
         return len(self._elements) > 0
 
+    def __repr__(self):
+        return f"TileElement(size={len(self._elements)}, contents={self._elements})"
+
+@dataclass(kw_only=True)
+class ElementPair:
+    """
+    Intermediary class for ElementSet classes
+    """
+    coordinate: Coordinate
+    element: GameElement
+
 
 class ElementSet(ABC):
     def __init__(self):
-        self._elements: List[Tuple[GameElement, Coordinate]] = []
+        self._elements: List[ElementPair] = []
 
     def add_element(self, element: GameElement, coordinate: Coordinate):
-        self._elements.append((element, coordinate))
+        self._elements.append(ElementPair(element=element, coordinate=coordinate))
 
-    def get_elements(self) -> List[Tuple[GameElement, Coordinate]]:
+    def get_element_pairs(self) -> List[ElementPair]:
         return self._elements
 
     def has_elements(self) -> bool:
@@ -99,28 +112,28 @@ class RelativeElementSet(ElementSet):
         :return: Coordinates of the element set relative to the board
         """
         converted_set = BoardElementSet()
-        for element in self.get_elements():
-            converted_coords = Coordinate(coordinate.x + element[1].x, coordinate.y + element[1].y)
-            if converted_coords.x > board.get_num_columns() or converted_coords.y > board.get_num_rows():
-                raise ValueError(f"{converted_coords} have elements outside of the bounds of the board")
-            converted_set.add_element(element[0], converted_coords)
+        for pair in self.get_element_pairs():
+            converted_coords = pair.coordinate + coordinate
+            if converted_coords.x > board.get_width() or converted_coords.y > board.get_height():
+                raise ValueError(f"{converted_coords} have elements outside of the bounds of the board [(0-0),({board.get_width()},{board.get_height()})]")
+            converted_set.add_element(pair.element, converted_coords)
 
         return converted_set
 
     def get_width(self) -> int:
-        left_x = min(map(lambda t: t[1].x, self._elements))
-        right_x = min(map(lambda t: t[1].x, self._elements))
+        left_x = min(map(lambda t: t.coordinate.x, self._elements))
+        right_x = min(map(lambda t: t.coordinate.x, self._elements))
         return left_x - right_x + 1
 
     def get_height(self) -> int:
-        top_y = min(map(lambda t: t[1].y, self._elements))
-        bottom_y = min(map(lambda t: t[1].y, self._elements))
+        top_y = min(map(lambda t: t.coordinate.y, self._elements))
+        bottom_y = min(map(lambda t: t.coordinate.y, self._elements))
         return bottom_y - top_y + 1
 
 
 class Board:
-    def __init__(self, rows: int, cols: int, player_id: int):
-        self._tiles: Matrix[TileElement] = Matrix(rows=rows, cols=cols, initializer=lambda: TileElement())
+    def __init__(self, height: int, width: int, player_id: int):
+        self._tiles: Matrix[TileElement] = Matrix(rows=height, cols=width, initializer=lambda: TileElement())
         self._match_rule: Optional[TileMatchRule] = None
         self._generator_rule: Optional[TileGeneratorRule] = None
         self._live_tiles: Optional[ElementSet] = None
@@ -155,14 +168,14 @@ class Board:
     def get_user_input_rules(self) -> Iterable[UserInputRuleSet]:
         return self._input_rules
 
-    def get_num_rows(self) -> int:
+    def get_height(self) -> int:
         return self._tiles.rows
 
-    def get_num_columns(self) -> int:
+    def get_width(self) -> int:
         return self._tiles.cols
 
-    def get_tile_at(self, row: int, col: int) -> TileElement:
-        return self._tiles.get_mutable(row, col)
+    def get_tile_at(self, coordinate: Coordinate) -> TileElement:
+        return self._tiles.get_mutable(coordinate.y, coordinate.x)
 
     def is_valid_coordinate(self, coordinate: Coordinate):
         return (coordinate.x in range(self._tiles.cols) and
@@ -189,9 +202,11 @@ class Board:
             match_found = self._match_rule.check_matches(self)
         if self._generator_rule is not None:
             generated_tile = self._generator_rule.produce_tiles(self)
+        for move_rule in self._move_rules:
+            move_rule.move_tiles(self)
 
     def spawn_tiles(self):
         if self._generator_rule:
             generated_tiles = self._generator_rule.produce_tiles(self)
             if generated_tiles:
-                print(f"Generated {len(generated_tiles.get_elements())} tiles")
+                print(f"Generated {len(generated_tiles.get_element_pairs())} tiles")

@@ -31,16 +31,16 @@ class ShiftStaticTilesRule(TileMovementRule):
         ...
 
     def _shift_all_down(self, board: Board):
-        for row in reversed(range(board.get_num_rows())):
-            for col in range(board.get_num_columns()):
+        for y in reversed(range(board.get_height())):
+            for x in range(board.get_width()):
                 for i in range(self._shift_amount):
-                    src_coordinate = Coordinate(col, row + i)
-                    target_coordinate = Coordinate(col, row + 1 + i)
+                    source_coordinate = Coordinate(x, y + i)
+                    target_coordinate = Coordinate(x, y + i + 1)
                     if (not board.is_valid_coordinate(target_coordinate) or
-                            board.get_tile_at(row+1 + i, col).has_elements() or
-                            not board.get_tile_at(row, col).can_support_move()):
+                            board.get_tile_at(target_coordinate).has_elements() or
+                            not board.get_tile_at(source_coordinate).can_support_move()):
                         continue
-                    board.swap_tile_contents(src_coordinate, target_coordinate)
+                    board.swap_tile_contents(source_coordinate, target_coordinate)
 
     def _shift_all_left(self, board: Board):
         ...
