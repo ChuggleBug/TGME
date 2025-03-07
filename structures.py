@@ -29,7 +29,7 @@ class Matrix(Generic[T]):
 
         self._rows = rows
         self._cols = cols
-        self._board = [[initializer() for _ in range(self._cols)] for _ in range(self._rows)]
+        self._entry = [[initializer() for _ in range(self._cols)] for _ in range(self._rows)]
 
     @property
     def rows(self) -> int:
@@ -52,7 +52,7 @@ class Matrix(Generic[T]):
         :return: mutable instance of element
         """
         self._check_bounds(r, c)
-        return self._board[r][c]
+        return self._entry[r][c]
 
     def get_copy(self, r: int, c: int) -> T:
         """
@@ -63,11 +63,16 @@ class Matrix(Generic[T]):
 
     def set(self, r: int, c: int, value: T):
         self._check_bounds(r, c)
-        self._board[r][c] = value
+        self._entry[r][c] = value
+
+    def swap(self, r1: int, c1: int, r2: int, c2: int):
+        self._check_bounds(r1, c1)
+        self._check_bounds(r2, c2)
+        self._entry[r1][c1], self._entry[r2][c2] = self._entry[r2][c2], self._entry[r1][c1]
 
     # Dunders
     def __repr__(self):
-        return str([f'i={i}: [{" ".join([repr(e) for e in row])}]' for i, row in enumerate(self._board)])
+        return str([f'i={i}: [{" ".join([repr(e) for e in row])}]' for i, row in enumerate(self._entry)])
 
 
 # Classes imported from *

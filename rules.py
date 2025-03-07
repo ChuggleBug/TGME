@@ -1,3 +1,4 @@
+# CONCRETE CLASSES SHOULD NOT GO HERE
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
@@ -8,6 +9,8 @@ if TYPE_CHECKING:
     from typing import Optional, Union
     from gameboard import Board, BoardElementSet
     from button_controller import DirectionButton, ActionButton
+    from shift_rules import ShiftDirection
+
 
 
 class ElementGenerationFailException(BaseException):
@@ -97,8 +100,44 @@ class TileGeneratorRule(ABC):
 class UserInputRule(ABC):
     """
     A single rule to determine how the board will handle user input
+
+    Implementing classes must define the `handle_input` method, which affects some
+    aspect of the board based on some event
     """
 
     @abstractmethod
     def handle_input(self, board: Board, *, event: Union[DirectionButton, ActionButton]):
+        ...
+
+
+class TileMovementRule(ABC):
+    """
+    A single rule to determine how tiles are intended to move
+
+    Implementing classes must define the `move_tiles` method, which moves either static or live tiles
+    in a shift direction by some shift amount
+
+    Example:
+        In many games, it is typical for elements to fall down by one tile every single game tick.
+        There are some exceptions such as in Puzzle Bobble where the launched element goes
+        up by one tile every cycle
+
+    Note:
+        In some games, there is a live tile which can be controlled by the player. Because
+        these element are not tracked by the board until they fall down to the bottom, rules there should
+        be special rules which exclusively affect only the board tiles and only the live elements.
+        Additionally, for shift values greater than 1, if a tile is not able to shift the entire
+        shift distance, then it will move the most it is capable of. For example, if the shift
+        distance of one, but after shifting only one tile, an element hits a wall, then it stops
+    """
+    def set_shift_direction(self, shift_direction: ShiftDirection):
+        self._shift_direction = shift_direction
+
+    def set_shift_amount(self, shift_amount: int):
+        if shift_amount <= 0:
+            raise ValueError(f"shift amount needs to be greater than one, not {shift_amount}")
+        self._shift_amount = shift_amount
+
+    @abstractmethod
+    def move_tiles(self, board: Board):
         ...

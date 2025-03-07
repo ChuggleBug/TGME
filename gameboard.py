@@ -10,14 +10,19 @@ from structures import Matrix
 from constants import Color
 
 if TYPE_CHECKING:
-    from typing import List, Set, Optional, Tuple, Iterable
+    from typing import List, Set, Optional, Tuple, Iterable, Any
     from button_controller import DirectionButton, ActionButton
-    from rules import TileMatchRule, TileGeneratorRule, UserInputRule
+    from rules import *
 
 
 class Coordinate(NamedTuple):
     x: int
     y: int
+
+    def __add__(self, other: Any) -> Coordinate:
+        if not isinstance(other, Coordinate):
+            return NotImplemented
+        return Coordinate(self.x + other.x, self.y + other.y)
 
 class UserInputRuleSet(NamedTuple):
     input_rule: UserInputRule
@@ -39,6 +44,8 @@ class GameElement(ABC):
     supports_color: bool = field(default=True)
     # The element's color. Only useful if supports_color is True
     element_color: Color = field(default=Color.WHITE)
+    # A single element can move around and is not locked to the tile
+    support_tile_move: bool = field(default=True)
 
 
 class TileElement:
@@ -51,8 +58,18 @@ class TileElement:
         """
         return all(map(lambda e: e.supports_tile_spawn, self._elements))
 
+    def can_support_move(self):
+        """
+        Indicates that has the capability to move. Tiles typically are blocked
+        from moving by
+        """
+        return all(map(lambda e: e.support_tile_move, self._elements))
+
     def add_game_element(self, element: GameElement):
         self._elements.append(element)
+
+    def has_elements(self) -> bool:
+        return len(self._elements) > 0
 
 
 class ElementSet(ABC):
@@ -108,6 +125,7 @@ class Board:
         self._generator_rule: Optional[TileGeneratorRule] = None
         self._live_tiles: Optional[ElementSet] = None
         self._input_rules: List[UserInputRuleSet] = []
+        self._move_rules: List[TileMovementRule] = []
         self._player_id = player_id
 
     def get_player_id(self):
@@ -122,16 +140,17 @@ class Board:
     def has_live_tiles(self) -> bool:
         return self._live_tiles is not None
 
-    # This function is sure to exist
     def set_tile_match_rule(self, match_rule: TileMatchRule):
         self._match_rule = match_rule
 
-    # This one might be subject to change
     def set_tile_generator_rule(self, generator_rule: TileGeneratorRule):
         self._generator_rule = generator_rule
 
     def add_user_input_rule(self, input_rule: UserInputRule, input_set: Set[DirectionButton | ActionButton]):
         self._input_rules.append(UserInputRuleSet(input_rule, input_set))
+
+    def add_move_rule(self, move_rule: TileMovementRule):
+        self._move_rules.append(move_rule)
 
     def get_user_input_rules(self) -> Iterable[UserInputRuleSet]:
         return self._input_rules
@@ -144,6 +163,21 @@ class Board:
 
     def get_tile_at(self, row: int, col: int) -> TileElement:
         return self._tiles.get_mutable(row, col)
+
+    def is_valid_coordinate(self, coordinate: Coordinate):
+        return (coordinate.x in range(self._tiles.cols) and
+                coordinate.y in range(self._tiles.rows))
+
+
+    def swap_tile_contents(self, c1: Coordinate, c2: Coordinate):
+        """
+        Swaps the contents of two tiles at specified coordinate. Note that
+        this does not whether tiles elements have support_tile_move set to False
+        :param c1: coordinate 1
+        :param c2: coordinate 2
+        """
+        self._tiles.swap(c1.y, c1.x, c2.y, c2.x)
+
 
     def update(self) -> None:
         """
