@@ -82,14 +82,31 @@ def set_tetris_generation(board: Board):
     generate_rule = DropElementSetRule()
     provider: UniformRandomElementProvider[RelativeElementSet] = UniformRandomElementProvider()
 
-    purple_tile = TetrisTile(name="PurpleTetrisTile", color=Color.PURPLE)
+    purple_tile = TetrisTile(name='PurpleTetrisTile', color=Color.PURPLE)
+    yellow_tile = TetrisTile(name='YellowTetrisTile', color=Color.YELLOW)
+    blue_tile = TetrisTile(name='LightBlueTetrisTile', color=Color.BLUE)
+
     t_block = RelativeElementSet()
     t_block.add_element(element=purple_tile, coordinate=Coordinate(1,0))
     t_block.add_element(element=purple_tile, coordinate=Coordinate(0, 1))
     t_block.add_element(element=purple_tile, coordinate=Coordinate(1, 1))
     t_block.add_element(element=purple_tile, coordinate=Coordinate(2, 1))
 
+    o_block = RelativeElementSet()
+    o_block.add_element(element=yellow_tile, coordinate=Coordinate(0, 0))
+    o_block.add_element(element=yellow_tile, coordinate=Coordinate(0, 1))
+    o_block.add_element(element=yellow_tile, coordinate=Coordinate(1, 0))
+    o_block.add_element(element=yellow_tile, coordinate=Coordinate(1, 1))
+
+    l_block = RelativeElementSet()
+    l_block.add_element(element=blue_tile, coordinate=Coordinate(0, 0))
+    l_block.add_element(element=blue_tile, coordinate=Coordinate(0, 1))
+    l_block.add_element(element=blue_tile, coordinate=Coordinate(0, 2))
+    l_block.add_element(element=blue_tile, coordinate=Coordinate(0, 3))
+
     provider.add_choice(t_block)
+    provider.add_choice(o_block)
+    provider.add_choice(l_block)
 
     generate_rule.set_provider(provider)
     board.set_tile_generator_rule(generate_rule)
@@ -113,6 +130,7 @@ if __name__ == "__main__":
     # tkinter specific
     controller.bind_to_window(game.get_window())
 
+    # This can be swapped with the other generated in this file
     set_candy_crush_generation(board)
 
     # This is not good practice, but for testing purposes,
@@ -121,6 +139,13 @@ if __name__ == "__main__":
     if generated_elements is not None:
         for pair in generated_elements.get_element_pairs():
             board.get_tile_at(pair.coordinate).add_game_element(pair.element)
+
+    # Technically, the viewing of live tiles should be handled by the renderer
+    # for this example, live lives (if any) are simply appended to the board itself
+    if board.has_live_tiles():
+        for pair in board.get_live_tiles().get_element_pairs():
+            board.get_tile_at(pair.coordinate).add_game_element(pair.element)
+
 
     # Start game
     game.start()

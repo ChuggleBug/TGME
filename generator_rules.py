@@ -39,7 +39,7 @@ class DropElementSetRule(TileGeneratorRule):
     def set_provider(self, provider: ElementProvider[RelativeElementSet]):
         self._provider = provider
 
-    def produce_tiles(self, board: Board) -> Optional[BoardElementSet]:
+    def produce_tiles(self, board: Board) -> None:
         if self._provider is None:
             raise ValueError("Element Provider is missing")
 
@@ -60,7 +60,7 @@ class DropElementSetRule(TileGeneratorRule):
 
 # TODO: maybe this can be configured in a method? inside of DropElementSetRule
 def _get_top_center_tile_set_coordinates(board: Board, tile_set: RelativeElementSet) -> Coordinate:
-    return Coordinate(x=(board.get_width() // 2) - (tile_set.get_width() // 2), y=0)
+    return Coordinate(x=(board.get_width() // 2) - (tile_set.get_width() // 2) + (1 - (tile_set.get_width()) % 2), y=0)
 
 
 class FillAllSpotsRule(TileGeneratorRule):

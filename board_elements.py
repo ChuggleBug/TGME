@@ -54,6 +54,9 @@ class ElementSet(ABC):
     def has_elements(self) -> bool:
         return len(self._elements) > 0
 
+    def __repr__(self):
+        return f'{self.__class__.__name__}(size={len(self._elements)}, elements={self._elements}'
+
 
 class RelativeElementSet(ElementSet):
     def as_board_coordinates(self, board: Board, coordinate: Coordinate) -> BoardElementSet:
@@ -75,12 +78,12 @@ class RelativeElementSet(ElementSet):
 
     def get_width(self) -> int:
         left_x = min(map(lambda t: t.coordinate.x, self._elements))
-        right_x = min(map(lambda t: t.coordinate.x, self._elements))
-        return left_x - right_x + 1
+        right_x = max(map(lambda t: t.coordinate.x, self._elements))
+        return right_x - left_x + 1
 
     def get_height(self) -> int:
         top_y = min(map(lambda t: t.coordinate.y, self._elements))
-        bottom_y = min(map(lambda t: t.coordinate.y, self._elements))
+        bottom_y = max(map(lambda t: t.coordinate.y, self._elements))
         return bottom_y - top_y + 1
 
 
