@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
@@ -48,6 +47,13 @@ class TileElement:
 
     def __repr__(self):
         return f"TileElement(size={len(self._elements)}, contents={self._elements})"
+
+    def get_elements(self) -> List[GameElement]:
+        """
+        Returns the list of GameElements in this tile.
+        Elements at lower indices are drawn on top of elements at higher indices.
+        """
+        return self._elements.copy()  # Return a copy to prevent external modification
 
 class Board:
     def __init__(self, height: int, width: int, player_id: int):

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from  typing import TYPE_CHECKING
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import List
 
@@ -30,6 +30,18 @@ class GameElement(ABC):
     element_color: Color = field(default=Color.DEFAULT)
     # A single element can move around and is not locked to the tile
     support_tile_move: bool = field(default=True)
+
+    @abstractmethod
+    def draw(self, canvas, x1: int, y1: int, x2: int, y2: int):
+        """
+        Draw this game element on the provided canvas within the bounding box.
+        
+        Args:
+            canvas: The tkinter canvas to draw on
+            x1, y1: Top-left corner coordinates
+            x2, y2: Bottom-right corner coordinates
+        """
+        pass
 
 
 @dataclass(kw_only=True)
