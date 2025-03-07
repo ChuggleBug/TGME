@@ -2,61 +2,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from abc import ABC, abstractmethod
-from typing import TypeVar, Generic
-import random
-import copy
-
 from gameboard import Board, RelativeElementSet, BoardElementSet, Coordinate
+from provider import ElementProvider
 from rules import TileGeneratorRule, ElementGenerationFailException
 
 if TYPE_CHECKING:
     from gameboard import GameElement
-    from typing import List, Tuple, Optional
-
-
-T = TypeVar("T")
-
-
-class ElementProvider(ABC, Generic[T]):
-    @abstractmethod
-    def provide(self) -> T:
-        """
-        Returns an instance of T.
-
-        It is up to the implementing class as how to return a value
-        :return: Any object of type T
-        """
-        ...
-
-
-class RandomElementProvider(ElementProvider, Generic[T]):
-
-    def __init__(self):
-        self._elementChoices: List[Tuple[T, int]] = []
-
-    def add_choice(self, *, option: T, weight: int):
-        """
-        Add a potential element which can be chosen from at random.
-        Weight values should be a number from 0 to 100 representing the
-        percen chance of it occurring
-        :param option: Element which can be chosen
-        :param weight: Percent chance of it occurring as an integer
-        """
-        if weight < 0 or weight > 100:
-            raise ValueError(f"weight={weight} not in range [0-100]")
-        if sum(map(lambda t: t[1], self._elementChoices), start=weight) > 100:
-            raise ValueError("Percent of element chances exceeds 100")
-        self._elementChoices.append((option, weight))
-
-    def _generate_random(self) -> T:
-        options, weights = zip(*self._elementChoices)  # Unpack elements and weights
-        return copy.deepcopy(random.choices(options, weights=weights)[0])
-
-    def provide(self) -> T:
-        if sum(map(lambda t: t[1], self._elementChoices)) != 100:
-            raise ValueError("Sum of weights is not equal to 100")
-        return self._generate_random()
+    from typing import Optional
 
 
 class FillEmptyTopRowSpotsRule(TileGeneratorRule):
