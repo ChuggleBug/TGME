@@ -1,12 +1,19 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 
 import copy
 import random
 
 from abc import ABC, abstractmethod
-from typing import Generic, List, Tuple, TypeVar
+from typing import Generic, TypeVar
 
-T = TypeVar("T")
+from board_elements import ElementSet
+
+if TYPE_CHECKING:
+    from typing import List, Tuple
+
+
+T = TypeVar("T", bound=ElementSet)
 
 
 class ElementProvider(ABC, Generic[T]):
@@ -65,3 +72,28 @@ class WeightedRandomElementProvider(ElementProvider, Generic[T]):
         if sum(map(lambda t: t[1], self._elementChoices)) != 100:
             raise ValueError("Sum of weights is not equal to 100")
         return self._generate_random()
+
+class RandomRepeatingQueueElementProvider(ElementProvider, Generic[T]):
+
+    def __init__(self):
+        self._element_choices: List[T] = []
+        self._queue: List[T] = []
+
+    def add_choice(self, option: T):
+        self._element_choices.append(option)
+        self._queue = self._element_choices[:]
+        random.shuffle(self._queue)
+
+    def _reshuffle(self):
+        if self._element_choices:
+            self._queue = self._element_choices[:]
+            random.shuffle(self._queue)
+
+    def provide(self) -> T:
+        if not self._element_choices:
+            raise ValueError("Provider has no elements to provide")
+
+        if not self._queue:
+            self._reshuffle()
+
+        return copy.deepcopy(self._queue.pop())
