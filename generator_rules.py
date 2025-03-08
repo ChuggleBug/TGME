@@ -48,19 +48,21 @@ class DropElementSetRule(TileGeneratorRule):
             return None
 
         new_set: RelativeElementSet = self._provider.provide()
-        insert = _get_top_center_tile_set_coordinates(board, new_set)
+        insert = self._get_top_center_tile_set_coordinates(board, new_set)
         active_set: BoardElementSet = new_set.as_board_coordinates(board, insert)
 
         for pair in active_set.get_element_pairs():
-            if not board.get_tile_at(pair.coordinate).can_support_tile_spawn():
+            if not (board.is_valid_coordinate(pair.coordinate) and
+                    board.get_tile_at(pair.coordinate).can_support_tile_spawn()):
                 raise ElementGenerationFailException()
 
         board.set_live_tile(active_set)
         return None # live tiles is responsible for managing the tiles generated here
 
-# TODO: maybe this can be configured in a method? inside of DropElementSetRule
-def _get_top_center_tile_set_coordinates(board: Board, tile_set: RelativeElementSet) -> Coordinate:
-    return Coordinate(x=(board.get_width() // 2) - (tile_set.get_width() // 2) + (1 - (tile_set.get_width()) % 2), y=0)
+    @staticmethod
+    def _get_top_center_tile_set_coordinates(board: Board, tile_set: RelativeElementSet) -> Coordinate:
+        return Coordinate(x=(board.get_width() // 2) - (tile_set.get_width() - (board.get_width() % 2)) // 2, y=0)
+
 
 
 class FillAllSpotsRule(TileGeneratorRule):
