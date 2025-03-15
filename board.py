@@ -9,8 +9,9 @@ from rules import UserInputRuleSet
 if TYPE_CHECKING:
     from typing import List, Set, Optional, Iterable, Any
     from button_controller import DirectionButton, ActionButton
-    from board_elements import GameElement, ElementSet
-    from rules import *
+    from board_elements import GameElement, ElementSet, BoardElementSet
+    from shift_rules import ShiftDirection
+    from rules import TileMatchRule, TileGeneratorRule, TileMovementRule, UserInputRule
 
 @dataclass
 class Coordinate:
@@ -37,7 +38,10 @@ class TileElement:
         Indicates that has the capability to move. Tiles typically are blocked
         from moving by
         """
-        return all(map(lambda e: e.support_tile_move, self._elements))
+        return all(map(lambda e: e.supports_tile_move, self._elements))
+
+    def can_move_through(self):
+        return all(map(lambda e:e.supports_move_through, self._elements))
 
     def add_game_element(self, element: GameElement):
         self._elements.append(element)
@@ -62,7 +66,8 @@ class Board:
         self._generator_rule: Optional[TileGeneratorRule] = None
         self._live_tiles: Optional[ElementSet] = None
         self._input_rules: List[UserInputRuleSet] = []
-        self._move_rules: List[TileMovementRule] = []
+        self._static_move_rule: Optional[TileMovementRule] = None
+        self._live_move_rule: Optional[TileMovementRule] = None
         self._player_id = player_id
 
     def get_player_id(self):
@@ -71,7 +76,7 @@ class Board:
     def get_live_tiles(self) -> Optional[BoardElementSet]:
         return self._live_tiles
 
-    def set_live_tile(self, live_tiles: BoardElementSet):
+    def set_live_tile(self, live_tiles: Optional[BoardElementSet]):
         self._live_tiles = live_tiles
 
     def has_live_tiles(self) -> bool:
@@ -86,8 +91,17 @@ class Board:
     def add_user_input_rule(self, input_rule: UserInputRule, *, input_set: Set[DirectionButton | ActionButton]):
         self._input_rules.append(UserInputRuleSet(input_rule, input_set))
 
-    def add_move_rule(self, move_rule: TileMovementRule):
-        self._move_rules.append(move_rule)
+    def set_static_tile_move_rule(self, move_rule: TileMovementRule):
+        self._static_move_rule = move_rule
+
+    def get_static_tile_move_direction(self) -> Optional[ShiftDirection]:
+        return self._static_move_rule.get_shift_direction() if self._static_move_rule is not None else None
+
+    def set_live_tile_move_rule(self, move_rule: TileMovementRule):
+        self._live_move_rule = move_rule
+
+    def get_live_tile_move_direction(self) -> Optional[ShiftDirection]:
+        return self._live_move_rule.get_shift_direction() if self._live_move_rule is not None else None
 
     def get_user_input_rules(self) -> Iterable[UserInputRuleSet]:
         return self._input_rules
@@ -105,7 +119,6 @@ class Board:
         return (coordinate.x in range(self._tiles.cols) and
                 coordinate.y in range(self._tiles.rows))
 
-
     def swap_tile_contents(self, c1: Coordinate, c2: Coordinate):
         """
         Swaps the contents of two tiles at specified coordinate. Note that
@@ -115,19 +128,36 @@ class Board:
         """
         self._tiles.swap(c1.y, c1.x, c2.y, c2.x)
 
+    def lock_live_tiles_to_board(self):
+        for pair in self._live_tiles.get_element_pairs():
+            self.get_tile_at(pair.coordinate).add_game_element(pair.element)
+        self._live_tiles = None
 
     def update(self) -> None:
         """
         update the game after a single tick has passed
         """
-        match_found = False
-        generated_tile: Optional[BoardElementSet] = None
-        if self._match_rule is not None:
-            match_found = self._match_rule.check_matches(self)
-        if self._generator_rule is not None:
-            generated_tile = self._generator_rule.produce_tiles(self)
-        for move_rule in self._move_rules:
-            move_rule.move_tiles(self)
+        self._try_apply_match_rule()
+        self._try_apply_generate_rule()
+        self._try_apply_move_rules()
+
+    def _try_apply_match_rule(self):
+        if self._match_rule is None or ( matches := self._match_rule.check_matches(self) ) is None:
+            return
+        for pair in matches.get_element_pairs():
+            pass
+
+    def _try_apply_generate_rule(self):
+        if self._generator_rule is None or ( generated_tiles := self._generator_rule.produce_tiles(self) ) is None:
+            return
+        for pair in generated_tiles.get_element_pairs():
+            self.get_tile_at(pair.coordinate).add_game_element(pair.element)
+
+    def _try_apply_move_rules(self):
+        if self._static_move_rule is not None:
+            self._static_move_rule.move_tiles(self)
+        if self._live_move_rule is not None:
+            self._live_move_rule.move_tiles(self)
 
     def spawn_tiles(self):
         if self._generator_rule:

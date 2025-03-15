@@ -1,6 +1,17 @@
-from board import Board, Coordinate
-from rules import TileMovementRule
+
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+# import copy
 from enum import Enum, auto
+
+from board import Coordinate
+from board_elements import ElementSet
+from rules import TileMovementRule
+
+if TYPE_CHECKING:
+    from board import Board
+
 
 class ShiftDirection(Enum):
     UP = auto()
@@ -17,6 +28,8 @@ class ShiftStaticTilesRule(TileMovementRule):
         self._shift_direction: ShiftDirection = ShiftDirection.DOWN
 
     def move_tiles(self, board: Board):
+        if not self._do_apply_move:
+            return
         if self._shift_direction == ShiftDirection.UP:
             self._shift_all_up(board)
         elif self._shift_direction == ShiftDirection.DOWN:
@@ -76,7 +89,7 @@ class ShiftStaticTilesRule(TileMovementRule):
                     board.swap_tile_contents(source_coordinate, target_coordinate)
 
 
-class ShiftLiveTiles(TileMovementRule):
+class ShiftLiveTilesRule(TileMovementRule):
 
     def __init__(self):
         # by convenience
@@ -84,4 +97,77 @@ class ShiftLiveTiles(TileMovementRule):
         self._shift_direction: ShiftDirection = ShiftDirection.DOWN
 
     def move_tiles(self, board: Board):
-        pass
+        if not self._do_apply_move:
+            return
+        if not board.has_live_tiles():
+            return
+        
+        if self._shift_direction == ShiftDirection.UP:
+            self._shift_all_up(board)
+        elif self._shift_direction == ShiftDirection.DOWN:
+            self._shift_all_down(board)
+        elif self._shift_direction == ShiftDirection.LEFT:
+            self._shift_all_left(board)
+        elif self._shift_direction == ShiftDirection.RIGHT:
+            self._shift_all_right(board)
+
+    def _shift_all_up(self, board):
+        shifted_set = board.get_live_tiles()
+        for i in range(self._shift_amount):
+            test_set = ElementSet.shift_elements(shifted_set, vertical=-1)
+            for pair in test_set.get_element_pairs():
+                if not (board.is_valid_coordinate(pair.coordinate) and
+                        board.get_tile_at(pair.coordinate).can_move_through()):
+                    if board.get_static_tile_move_direction() == self._shift_direction:
+                        board.lock_live_tiles_to_board()
+                    return
+            shifted_set = test_set
+        board.set_live_tile(shifted_set)
+
+    def _shift_all_down(self, board):
+        shifted_set = board.get_live_tiles()
+        for i in range(self._shift_amount):
+            test_set = ElementSet.shift_elements(shifted_set, vertical=1)
+            for pair in test_set.get_element_pairs():
+                if not (board.is_valid_coordinate(pair.coordinate) and
+                        board.get_tile_at(pair.coordinate).can_move_through()):
+                    if board.get_static_tile_move_direction() == self._shift_direction:
+                        board.lock_live_tiles_to_board()
+                    return
+            shifted_set = test_set
+        board.set_live_tile(shifted_set)
+
+    def _shift_all_left(self, board: Board):
+        # given the live tile set
+        shifted_set = board.get_live_tiles()
+        # shift all tiles in some direction (one at a time)
+        for i in range(self._shift_amount):
+            test_set = ElementSet.shift_elements(shifted_set, horizontal=-1)
+            # check if the move was valid
+            for pair in test_set.get_element_pairs():
+                # If not, if it happens to be in the
+                # direction that static tiles move
+                if not (board.is_valid_coordinate(pair.coordinate) and
+                        board.get_tile_at(pair.coordinate).can_move_through()):
+                    if board.get_static_tile_move_direction() == self._shift_direction:
+                        board.lock_live_tiles_to_board()
+                    return
+            # otherwise, continue shifting
+            shifted_set = test_set
+        # when the full shift was complete, set the live tile
+        # set to the one that was shifted
+        board.set_live_tile(shifted_set)
+
+    def _shift_all_right(self, board):
+        shifted_set = board.get_live_tiles()
+        for i in range(self._shift_amount):
+            test_set = ElementSet.shift_elements(shifted_set, horizontal=1)
+            for pair in test_set.get_element_pairs():
+                if not (board.is_valid_coordinate(pair.coordinate) and
+                        board.get_tile_at(pair.coordinate).can_move_through()):
+                    if board.get_static_tile_move_direction() == self._shift_direction:
+                        board.lock_live_tiles_to_board()
+                    return
+            shifted_set = test_set
+        board.set_live_tile(shifted_set)
+        

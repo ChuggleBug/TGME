@@ -135,7 +135,14 @@ class TileMovementRule(ABC):
         Additionally, for shift values greater than 1, if a tile is not able to shift the entire
         shift distance, then it will move the most it is capable of. For example, if the shift
         distance of one, but after shifting only one tile, an element hits a wall, then it stops
+        In some cases, a tile might not want to move even when it is told to. This could be due to aesthetic
+        reason such as a visual effect happening on the screen. For these cases, tile movement provides
+        means to enable and disable movement. This means that implementing classes should check the
+        corresponding flag which is managed by the tile movement flag on every call
     """
+    def get_shift_direction(self) -> ShiftDirection:
+        return self._shift_direction
+
     def set_shift_direction(self, shift_direction: ShiftDirection):
         self._shift_direction = shift_direction
 
@@ -143,6 +150,12 @@ class TileMovementRule(ABC):
         if shift_amount <= 0:
             raise ValueError(f"shift amount needs to be greater than one, not {shift_amount}")
         self._shift_amount = shift_amount
+
+    def enable_tile_movement(self):
+        self._do_apply_move = True
+
+    def disable_tile_movement(self):
+        self._do_apply_move = False
 
     @abstractmethod
     def move_tiles(self, board: Board):

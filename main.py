@@ -6,7 +6,7 @@ from game import Game, DownwardGravityRule
 from button_controller import KeyboardController, DirectionButton, ActionButton
 from board import Board, Coordinate
 from board_elements import RelativeElementSet, BoardElementSet, GameElement
-from provider import WeightedRandomElementProvider, UniformRandomElementProvider
+from provider import RandomRepeatingQueueElementProvider
 from constants import Color
 
 if TYPE_CHECKING:
@@ -212,7 +212,7 @@ def set_tetris_generation(board: Board, game: Game = None, controller: KeyboardC
     """
     # Set up the piece generator
     generate_rule = DropElementSetRule()
-    provider: UniformRandomElementProvider[RelativeElementSet] = UniformRandomElementProvider()
+    provider: RandomRepeatingQueueElementProvider[RelativeElementSet] = RandomRepeatingQueueElementProvider()
 
     # Add all the different Tetris pieces to the provider
     for piece in create_tetris_pieces():
@@ -346,7 +346,7 @@ def create_tetris_pieces():
     pieces = []
     
     # I-piece (long bar) - Cyan
-    cyan_tile = TetrisTile(name='CyanTetrisTile', color=Color.BLUE)
+    cyan_tile = TetrisTile(name='CyanTetrisTile', color=Color.LIGHT_BLUE)
     i_piece = RelativeElementSet()
     i_piece.add_element(element=cyan_tile, coordinate=Coordinate(0, 0))
     i_piece.add_element(element=cyan_tile, coordinate=Coordinate(0, 1))
@@ -372,8 +372,8 @@ def create_tetris_pieces():
     t_piece.add_element(element=purple_tile, coordinate=Coordinate(2, 1))
     pieces.append(t_piece)
     
-    # L-piece - Orange (using RED as a substitute)
-    red_tile = TetrisTile(name='RedTetrisTile', color=Color.RED)
+    # L-piece - Orange
+    red_tile = TetrisTile(name='RedTetrisTile', color=Color.ORANGE)
     l_piece = RelativeElementSet()
     l_piece.add_element(element=red_tile, coordinate=Coordinate(2, 0))
     l_piece.add_element(element=red_tile, coordinate=Coordinate(0, 1))
@@ -381,8 +381,8 @@ def create_tetris_pieces():
     l_piece.add_element(element=red_tile, coordinate=Coordinate(2, 1))
     pieces.append(l_piece)
     
-    # J-piece - Blue (using GREEN as a substitute)
-    green_tile = TetrisTile(name='GreenTetrisTile', color=Color.GREEN)
+    # J-piece - Blue
+    green_tile = TetrisTile(name='GreenTetrisTile', color=Color.BLUE)
     j_piece = RelativeElementSet()
     j_piece.add_element(element=green_tile, coordinate=Coordinate(0, 0))
     j_piece.add_element(element=green_tile, coordinate=Coordinate(0, 1))
@@ -398,7 +398,7 @@ if __name__ == "__main__":
     # You can modify these settings to change the game
     board_size = (15, 10)  # (height, width) - Change this to adjust board size
     drop_speed = 1000      # Time in milliseconds between drops (1000 = 1 second)
-    add_obstacles = True   # Set to False to remove obstacles
+    add_obstacles = False   # Set to False to remove obstacles
     
     # === GAME INITIALIZATION ===
     print("=== STARTING TETRIS GAME ===")

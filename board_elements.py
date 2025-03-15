@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import copy
 from  typing import TYPE_CHECKING
 
 from abc import ABC, abstractmethod
@@ -29,7 +31,9 @@ class GameElement(ABC):
     # The element's color. Only useful if supports_color is True
     element_color: Color = field(default=Color.DEFAULT)
     # A single element can move around and is not locked to the tile
-    support_tile_move: bool = field(default=True)
+    supports_tile_move: bool = field(default=True)
+    # Live tiles can move through this element
+    support_move_through: bool = field(default=True)
 
     @abstractmethod
     def draw(self, canvas, x1: int, y1: int, x2: int, y2: int):
@@ -65,6 +69,16 @@ class ElementSet(ABC):
 
     def has_elements(self) -> bool:
         return len(self._elements) > 0
+
+    @classmethod
+    def shift_elements(cls, e_set: ElementSet, *, horizontal: int = 0, vertical: int = 0) -> ElementSet:
+        shifted_set = e_set.__class__()
+        for pair in e_set.get_element_pairs():
+            shift_coordinate = copy.deepcopy(pair.coordinate)
+            shift_coordinate.x += horizontal
+            shift_coordinate.y += vertical
+            shifted_set.add_element(pair.element, shift_coordinate)
+        return shifted_set
 
     def __repr__(self):
         return f'{self.__class__.__name__}(size={len(self._elements)}, elements={self._elements}'
