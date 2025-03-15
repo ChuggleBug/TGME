@@ -5,15 +5,15 @@ import copy
 import random
 
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Union
 
-from board_elements import ElementSet
+from board_elements import ElementSet, GameElement
 
 if TYPE_CHECKING:
     from typing import List, Tuple
 
 
-T = TypeVar("T", bound=ElementSet)
+T = TypeVar("T", bound=Union[GameElement, ElementSet])
 
 
 class ElementProvider(ABC, Generic[T]):

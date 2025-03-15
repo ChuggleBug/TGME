@@ -33,7 +33,7 @@ class GameElement(ABC):
     # A single element can move around and is not locked to the tile
     supports_tile_move: bool = field(default=True)
     # Live tiles can move through this element
-    support_move_through: bool = field(default=True)
+    supports_move_through: bool = field(default=True)
 
     @abstractmethod
     def draw(self, canvas, x1: int, y1: int, x2: int, y2: int):

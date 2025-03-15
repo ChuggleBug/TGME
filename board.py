@@ -41,7 +41,7 @@ class TileElement:
         return all(map(lambda e: e.supports_tile_move, self._elements))
 
     def can_move_through(self):
-        return all(map(lambda e:e.supports_move_through, self._elements))
+        return all(map(lambda e: e.supports_move_through, self._elements))
 
     def add_game_element(self, element: GameElement):
         self._elements.append(element)
