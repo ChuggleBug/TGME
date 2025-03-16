@@ -134,6 +134,8 @@ class DownwardsShiftLiveTileRule(UserInputRule):
         else:
             # If can't move down, convert live tiles to static tiles
             board.lock_live_tiles_to_board()
+
+# I dont think we need any of this
 #
 #     def _lock_live_tiles(self, board: Board):
 #         """Convert live tiles to static tiles when they can't move down anymore."""
@@ -239,3 +241,41 @@ class DownwardsShiftLiveTileRule(UserInputRule):
 #     except Exception as e:
 #         print(f"Error generating new piece: {e}")
 #         return None
+
+class CursorApplyDirectionRule(UserInputRule):
+    def handle_input(self, board: Board, *, event: Union[DirectionButton, ActionButton]):
+        cursor = board.get_cursor()
+        primary_coordinate = cursor.get_primary_position()
+        test_coordinate = primary_coordinate # stub initialization
+        if event == DirectionButton.UP:
+            test_coordinate = primary_coordinate + Coordinate(0, -1)
+        elif event == DirectionButton.DOWN:
+            test_coordinate = primary_coordinate + Coordinate(0, 1)
+        elif event == DirectionButton.LEFT:
+            test_coordinate = primary_coordinate + Coordinate(-1, 0)
+        elif event == DirectionButton.RIGHT:
+            test_coordinate = primary_coordinate + Coordinate(1, 0)
+
+        if not board.is_valid_coordinate(test_coordinate):
+            return
+        if cursor.is_in_movement_state():
+            cursor.set_primary_position(test_coordinate)
+        else:  # in secondary state
+            cursor.set_secondary_position(test_coordinate)
+
+# TODO: while the tiles swap properly, in games which typically swap
+#  tiles have a check which only allows movement if a match would be made
+#  Make a function that does that check (or use match rules, but that might not work)
+class CursorApplySelectionRule(UserInputRule):
+    def handle_input(self, board: Board, *, event: Union[DirectionButton, ActionButton]):
+        cursor = board.get_cursor()
+        if event == ActionButton.PRIMARY:
+            if cursor.is_in_swapping_state() and cursor.has_secondary_position():
+                if (board.get_tile_at(cursor.get_primary_position()).can_support_move() and
+                        board.get_tile_at(cursor.get_secondary_position()).can_support_move()):
+                    board.swap_tile_contents(cursor.get_primary_position(), cursor.get_secondary_position())
+                    cursor.set_movement_state()
+            else:
+                cursor.set_swapping_state()
+        elif event == ActionButton.SECONDARY:
+            cursor.set_movement_state()

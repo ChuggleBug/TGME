@@ -72,7 +72,7 @@ class FillAllSpotsRule(TileGeneratorRule):
     def set_provider(self, provider: ElementProvider[GameElement]):
         self._provider = provider
 
-    def produce_tiles(self, board: Board) -> Optional[GameElement]:
+    def produce_tiles(self, board: Board) -> Optional[BoardElementSet]:
         generated_tiles = BoardElementSet()
         for y in range(board.get_height()):
             for x in range(board.get_width()):

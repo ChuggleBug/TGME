@@ -4,14 +4,54 @@ from typing import TYPE_CHECKING
 from constants import Color
 from structures import Matrix
 from rules import UserInputRuleSet, GravityRule, MatchEventRule
+from board_elements import Coordinate
 
 if TYPE_CHECKING:
     from typing import List, Set, Optional, Iterable
     from button_controller import DirectionButton, ActionButton
-    from board_elements import GameElement, ElementSet, BoardElementSet, Coordinate
+    from board_elements import GameElement, ElementSet, BoardElementSet
     from shift_rules import ShiftDirection
     from rules import TileMatchRule, TileGeneratorRule, TileMovementRule, UserInputRule
 
+
+class Cursor:
+    def __init__(self):
+        self._primary_location: Coordinate = Coordinate(0, 0)
+        self._secondary_location: Optional[Coordinate] = None
+        self._is_in_swapping_state: bool = False
+
+    def set_primary_position(self, coordinate: Coordinate):
+        self._primary_location = coordinate
+
+    def set_secondary_position(self, coordinate: Coordinate):
+        self._secondary_location = coordinate
+
+    def get_primary_position(self) -> Coordinate:
+        return self._primary_location
+
+    def has_secondary_position(self) -> bool:
+        return self._secondary_location is not None
+
+    def get_secondary_position(self) -> Coordinate:
+        return self._secondary_location
+
+    def is_in_movement_state(self) -> bool:
+        return not self._is_in_swapping_state
+
+    def is_in_swapping_state(self) -> bool:
+        return self._is_in_swapping_state
+
+    def set_movement_state(self):
+        self._is_in_swapping_state = False
+        self._secondary_location = None
+
+    def set_swapping_state(self):
+        self._is_in_swapping_state = True
+
+    # TODO: Change the implementation to support drawing
+    #  specifications are provided
+    def draw(self):
+        ...
 
 class TileElement:
     def __init__(self):
@@ -79,6 +119,7 @@ class Board:
         self._static_move_rule: Optional[TileMovementRule] = None
         self._match_events: List[MatchEventRule] = []
         self._gravity_rule: Optional[GravityRule] = None
+        self._cursor: Optional[Cursor] = None
         self._player_id = player_id
 
     def get_player_id(self):
@@ -92,6 +133,15 @@ class Board:
 
     def has_live_tiles(self) -> bool:
         return self._live_tiles is not None
+
+    def enable_cursor(self):
+        self._cursor = Cursor()
+
+    def has_cursor(self) -> bool:
+        return self._cursor is not None
+
+    def get_cursor(self) -> Cursor:
+        return self._cursor
 
     def set_tile_match_rule(self, match_rule: TileMatchRule):
         self._match_rule = match_rule
