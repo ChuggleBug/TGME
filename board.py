@@ -1,27 +1,16 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from dataclasses import dataclass
-
 from structures import Matrix
-from rules import UserInputRuleSet
+from rules import UserInputRuleSet, GravityRule
 
 if TYPE_CHECKING:
-    from typing import List, Set, Optional, Iterable, Any
+    from typing import List, Set, Optional, Iterable
     from button_controller import DirectionButton, ActionButton
-    from board_elements import GameElement, ElementSet, BoardElementSet
+    from board_elements import GameElement, ElementSet, BoardElementSet, Coordinate
     from shift_rules import ShiftDirection
     from rules import TileMatchRule, TileGeneratorRule, TileMovementRule, UserInputRule
 
-@dataclass
-class Coordinate:
-    x: int
-    y: int
-
-    def __add__(self, other: Any) -> Coordinate:
-        if not isinstance(other, Coordinate):
-            return NotImplemented
-        return Coordinate(self.x + other.x, self.y + other.y)
 
 class TileElement:
     def __init__(self):
@@ -67,7 +56,8 @@ class Board:
         self._live_tiles: Optional[ElementSet] = None
         self._input_rules: List[UserInputRuleSet] = []
         self._static_move_rule: Optional[TileMovementRule] = None
-        self._live_move_rule: Optional[TileMovementRule] = None
+        # self._live_move_rule: Optional[TileMovementRule] = None
+        self._gravity_rule: Optional[GravityRule] = None
         self._player_id = player_id
 
     def get_player_id(self):
@@ -97,11 +87,8 @@ class Board:
     def get_static_tile_move_direction(self) -> Optional[ShiftDirection]:
         return self._static_move_rule.get_shift_direction() if self._static_move_rule is not None else None
 
-    def set_live_tile_move_rule(self, move_rule: TileMovementRule):
-        self._live_move_rule = move_rule
-
-    def get_live_tile_move_direction(self) -> Optional[ShiftDirection]:
-        return self._live_move_rule.get_shift_direction() if self._live_move_rule is not None else None
+    def set_gravity_rule(self, gravity_rule: GravityRule):
+        self._gravity_rule = gravity_rule
 
     def get_user_input_rules(self) -> Iterable[UserInputRuleSet]:
         return self._input_rules
@@ -133,13 +120,14 @@ class Board:
             self.get_tile_at(pair.coordinate).add_game_element(pair.element)
         self._live_tiles = None
 
-    def update(self) -> None:
+    def update(self, time_ms: int) -> None:
         """
         update the game after a single tick has passed
         """
         self._try_apply_match_rule()
         self._try_apply_generate_rule()
         self._try_apply_move_rules()
+        self._try_apply_gravity_rule(time_ms)
 
     def _try_apply_match_rule(self):
         if self._match_rule is None or ( matches := self._match_rule.check_matches(self) ) is None:
@@ -156,8 +144,10 @@ class Board:
     def _try_apply_move_rules(self):
         if self._static_move_rule is not None:
             self._static_move_rule.move_tiles(self)
-        if self._live_move_rule is not None:
-            self._live_move_rule.move_tiles(self)
+
+    def _try_apply_gravity_rule(self, time_ms: int):
+        if self._gravity_rule is not None:
+            self._gravity_rule.update(self, current_time=time_ms)
 
     def spawn_tiles(self):
         if self._generator_rule:

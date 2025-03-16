@@ -2,8 +2,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from board import Board, Coordinate
-from board_elements import RelativeElementSet, BoardElementSet, GameElement
+from board import Board
+from board_elements import RelativeElementSet, BoardElementSet, GameElement, Coordinate
 from provider import ElementProvider
 from rules import TileGeneratorRule, ElementGenerationFailException
 

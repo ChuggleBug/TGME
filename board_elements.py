@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from  typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -10,7 +10,7 @@ from typing import List
 from constants import Color
 
 if TYPE_CHECKING:
-    from board import Coordinate, Board
+    from board import Board
 
 @dataclass
 class GameElement(ABC):
@@ -112,7 +112,75 @@ class RelativeElementSet(ElementSet):
         bottom_y = max(map(lambda t: t.coordinate.y, self._elements))
         return bottom_y - top_y + 1
 
+    def rotate_counterclockwise(self) -> None:
+        """
+        Rotate the tile set 90 degrees counterclockwise relative to its center
+        """
+        if not self._elements:
+            return
+
+        # plain 90 degree rotation
+        for pair in self.get_element_pairs():
+            pair.coordinate.x, pair.coordinate.y = -1 * pair.coordinate.y, pair.coordinate.x
+
+        # reorganize the origin to the new top right
+        top_right = Coordinate(
+            x=min(map(lambda pair: pair.coordinate.x, self.get_element_pairs())),
+            y=min(map(lambda pair: pair.coordinate.y, self.get_element_pairs())),
+        )
+        for pair in self.get_element_pairs():
+            pair.coordinate = pair.coordinate - top_right
+
+    def rotate_clockwise(self) -> None:
+        """
+        Rotate the tile set 90 degrees clockwise relative to its center
+        """
+        if not self._elements:
+            return
+
+        # plain 90 degree rotation
+        for pair in self.get_element_pairs():
+            pair.coordinate.x, pair.coordinate.y = pair.coordinate.y, -1 * pair.coordinate.x
+
+        # reorganize the origin to the new top right
+        top_right = Coordinate(
+            x=min(map(lambda pair: pair.coordinate.x, self.get_element_pairs())),
+            y=min(map(lambda pair: pair.coordinate.y, self.get_element_pairs())),
+        )
+        for pair in self.get_element_pairs():
+            pair.coordinate = pair.coordinate - top_right
+
 
 class BoardElementSet(ElementSet):
     def as_relative_coordinates(self) -> RelativeElementSet:
-        ...
+        element_set = RelativeElementSet()
+        origin = self.get_top_right()
+        for pair in self.get_element_pairs():
+            element_set.add_element(
+                element=pair.element,
+                coordinate=pair.coordinate - origin
+            )
+        return element_set
+
+    def get_top_right(self) -> Coordinate:
+        # top right = lowest x, lowest y
+        return Coordinate(
+            x=min(map(lambda pair: pair.coordinate.x, self.get_element_pairs())),
+            y=min(map(lambda pair: pair.coordinate.y, self.get_element_pairs())),
+        )
+
+
+@dataclass
+class Coordinate:
+    x: int
+    y: int
+
+    def __add__(self, other: Any) -> Coordinate:
+        if not isinstance(other, Coordinate):
+            return NotImplemented
+        return Coordinate(self.x + other.x, self.y + other.y)
+
+    def __sub__(self, other: Any) -> Coordinate:
+        if not isinstance(other, Coordinate):
+            return NotImplemented
+        return Coordinate(self.x - other.x, self.y - other.y)

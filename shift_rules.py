@@ -5,8 +5,7 @@ from typing import TYPE_CHECKING
 # import copy
 from enum import Enum, auto
 
-from board import Coordinate
-from board_elements import ElementSet
+from board_elements import ElementSet, Coordinate
 from rules import TileMovementRule
 
 if TYPE_CHECKING:

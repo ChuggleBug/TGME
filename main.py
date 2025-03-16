@@ -2,10 +2,11 @@ from typing import TYPE_CHECKING
 
 from generator_rules import FillAllSpotsRule, FillEmptyTopRowSpotsRule, DropElementSetRule
 from rules import UserInputRule, TileMatchRule
-from game import Game, DownwardGravityRule
+from game import Game
+from gravity_rules import DownwardGravityRule
 from button_controller import KeyboardController, DirectionButton, ActionButton
-from board import Board, Coordinate
-from board_elements import RelativeElementSet, BoardElementSet, GameElement
+from board import Board
+from board_elements import RelativeElementSet, BoardElementSet, GameElement, Coordinate
 from provider import RandomRepeatingQueueElementProvider
 from constants import Color
 
@@ -189,7 +190,7 @@ def set_candy_crush_generation(board: Board):
     # FillEmptyTopRowSpotsRule to FillAllSpotsRule
     generate_rule = FillEmptyTopRowSpotsRule()
     # Generators rules need element providers
-    provider: WeightedRandomElementProvider[GameElement] = WeightedRandomElementProvider()
+    provider: RandomRepeatingQueueElementProvider[GameElement] = RandomRepeatingQueueElementProvider()
     provider.add_choice(option=Candy(name='CandyRed', color=Color.RED), weight=25)
     provider.add_choice(option=Candy(name='CandyBlue', color=Color.BLUE), weight=50)
     provider.add_choice(option=Candy(name='CandyGreen', color=Color.GREEN), weight=25)

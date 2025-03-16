@@ -160,3 +160,14 @@ class TileMovementRule(ABC):
     @abstractmethod
     def move_tiles(self, board: Board):
         ...
+
+class GravityRule(ABC):
+
+    def set_update_rate(self, *, time_ms: int):
+        self._update_rate = time_ms
+
+    @abstractmethod
+    def update(self, board: Board, current_time_ms: int):
+        ...
+
+
