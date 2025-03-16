@@ -128,6 +128,8 @@ def apply_tetris_rule(board: Board):
 if __name__ == '__main__':
     game = Game()
 
+    # TODO: typically the tetris board is 40x10, but the GUI
+    #  gets weird for larger sizes. Maybe someone can fix that?
     board = Board(height=30, width=10, player_id=5)
     apply_tetris_rule(board)
 
