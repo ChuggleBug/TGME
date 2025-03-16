@@ -263,9 +263,6 @@ class CursorApplyDirectionRule(UserInputRule):
         else:  # in secondary state
             cursor.set_secondary_position(test_coordinate)
 
-# TODO: while the tiles swap properly, in games which typically swap
-#  tiles have a check which only allows movement if a match would be made
-#  Make a function that does that check (or use match rules, but that might not work)
 class CursorApplySelectionRule(UserInputRule):
     def handle_input(self, board: Board, *, event: Union[DirectionButton, ActionButton]):
         cursor = board.get_cursor()
@@ -274,7 +271,11 @@ class CursorApplySelectionRule(UserInputRule):
                 if (board.get_tile_at(cursor.get_primary_position()).can_support_move() and
                         board.get_tile_at(cursor.get_secondary_position()).can_support_move()):
                     board.swap_tile_contents(cursor.get_primary_position(), cursor.get_secondary_position())
-                    cursor.set_movement_state()
+                    # A match was not made, revert
+                    if not len(board.get_tile_match_rule().check_matches(board)) > 0:
+                        board.swap_tile_contents(cursor.get_primary_position(), cursor.get_secondary_position())
+                    else:
+                        cursor.set_movement_state()
             else:
                 cursor.set_swapping_state()
         elif event == ActionButton.SECONDARY:

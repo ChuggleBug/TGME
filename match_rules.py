@@ -8,12 +8,16 @@ from rules import TileMatchRule, MatchEventRule
 
 class MatchARowRule(TileMatchRule):
 
-    def check_matches(self, board: Board) -> List[Coordinate]:
-        to_destroy = []
+    def check_matches(self, board) -> List[Coordinate]:
+        matches = []
         for y in reversed(range(board.get_height())):
             coordinate_row = [Coordinate(x, y) for x in range(board.get_width())]
             if all(map(lambda coordinate: board.get_tile_at(coordinate).has_elements(), coordinate_row)):
-                to_destroy.extend(coordinate_row)
+                matches.extend(coordinate_row)
+        return matches
+
+    def remove_matches(self, board: Board) -> List[Coordinate]:
+        to_destroy = self.check_matches(board)
 
         for coordinate in to_destroy:
             board.get_tile_at(coordinate).apply_destroy()
@@ -21,19 +25,25 @@ class MatchARowRule(TileMatchRule):
         return to_destroy
 
 class MatchNOfColorRule(TileMatchRule):
+
     def __init__(self, match_length: int = 3):
         self._match_length = match_length
 
     def set_match_length(self, match_length: int):
         self._match_length = match_length
 
-    def check_matches(self, board: Board) -> List[Coordinate]:
-        to_destroy = []
+    def check_matches(self, board) -> List[Coordinate]:
+        matches = []
         for x in range(board.get_width()):
             for y in range(board.get_height()):
-                for coordinate in self._check_at(board, Coordinate(x,y)):
-                    if coordinate not in to_destroy:
-                        to_destroy.append(coordinate)
+                for coordinate in self._check_at(board, Coordinate(x, y)):
+                    if coordinate not in matches:
+                        matches.append(coordinate)
+        return matches
+
+    def remove_matches(self, board: Board) -> List[Coordinate]:
+        to_destroy = self.check_matches(board)
+
         for coordinate in to_destroy:
             board.get_tile_at(coordinate).apply_destroy()
         return to_destroy

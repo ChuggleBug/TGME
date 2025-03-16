@@ -49,11 +49,23 @@ class TileMatchRule(ABC):
     """
 
     @abstractmethod
-    def check_matches(self, board: Board) -> List[Coordinate]:
+    def remove_matches(self, board: Board) -> List[Coordinate]:
         """
-        A single rule to check for a match on a board
+        A single rule to check and delete matches on a board
         :param board: The board to check
-        :return: Wether or not a match was made
+        :return: List of coordinates which were removed
+        """
+        ...
+
+    @abstractmethod
+    def check_matches(self, board) -> List[Coordinate]:
+        """
+        A single rule to check matches on a board,
+        Does not delete matches.
+        This method is typically not used, except by other rules which
+        might need this information
+        :param board: The board to check
+        :return: List of coordinates where matches were found
         """
         ...
 

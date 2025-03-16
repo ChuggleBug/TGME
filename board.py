@@ -146,6 +146,9 @@ class Board:
     def set_tile_match_rule(self, match_rule: TileMatchRule):
         self._match_rule = match_rule
 
+    def get_tile_match_rule(self) -> TileMatchRule:
+        return self._match_rule
+
     def set_tile_generator_rule(self, generator_rule: TileGeneratorRule):
         self._generator_rule = generator_rule
 
@@ -206,7 +209,7 @@ class Board:
     def _try_apply_match_rule(self):
         if self._match_rule is None:
             return
-        destroyed_tiles = self._match_rule.check_matches(self)
+        destroyed_tiles = self._match_rule.remove_matches(self)
         if len(destroyed_tiles) > 0:
             for event in self._match_events:
                 event.trigger(self, destroyed_tiles)
