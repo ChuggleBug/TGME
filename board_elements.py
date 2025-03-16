@@ -34,6 +34,8 @@ class GameElement(ABC):
     supports_tile_move: bool = field(default=True)
     # Live tiles can move through this element
     supports_move_through: bool = field(default=True)
+    # The element "absorbs" a destroy
+    do_block_destroy: bool = field(default=False)
 
     @abstractmethod
     def draw(self, canvas, x1: int, y1: int, x2: int, y2: int):
@@ -184,3 +186,8 @@ class Coordinate:
         if not isinstance(other, Coordinate):
             return NotImplemented
         return Coordinate(self.x - other.x, self.y - other.y)
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Coordinate):
+            return False
+        return self.x == other.x and self.y == other.y

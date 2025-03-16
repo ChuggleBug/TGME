@@ -6,9 +6,9 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, NamedTuple, Set
 
 if TYPE_CHECKING:
-    from typing import Optional, Union
+    from typing import Optional, Union, List
     from board import Board
-    from board_elements import BoardElementSet
+    from board_elements import BoardElementSet, Coordinate
     from button_controller import DirectionButton, ActionButton
     from shift_rules import ShiftDirection
 
@@ -25,15 +25,13 @@ class ElementGenerationFailException(BaseException):
     pass
 
 
-# Don't Use. Will ask professor about how to use this design pattern
-class Rule(ABC):
+class MatchEventRule(ABC):
     """
-    Marker interface to indicate that a class is a rule.
-
-    Note:
-        The actual instance should be determined at runtime
+    A single event to perform after an
     """
-    pass
+    @abstractmethod
+    def trigger(self, board: Board, coordinates: List[Coordinate]):
+        ...
 
 class TileMatchRule(ABC):
     """
@@ -47,17 +45,15 @@ class TileMatchRule(ABC):
         method should detect when a row is full and clear it (Ex: Tetris).
 
     Note:
-        This rule is only responsible for detecting matches. Clearing should be done by some other
-        rule of the board itself.
+        This rule should be responsible clearing matches.
     """
 
     @abstractmethod
-    def check_matches(self, board: Board) -> Optional[BoardElementSet]:
+    def check_matches(self, board: Board) -> List[Coordinate]:
         """
         A single rule to check for a match on a board
         :param board: The board to check
-        :return: The set of tiles which should be removed.
-                 None if no matches were made
+        :return: Wether or not a match was made
         """
         ...
 
