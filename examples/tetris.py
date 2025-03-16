@@ -1,20 +1,23 @@
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
-from clock import Clock
-from generator_rules import DropElementSetRule
-from rules import UserInputRule
 from game import Game
+from board import Board
+from board_elements import GameElement, RelativeElementSet, Coordinate
 from button_controller import KeyboardController, DirectionButton, ActionButton
-from board import Board, Coordinate
-from board_elements import RelativeElementSet, GameElement
+
+from input_rules import HorizontalShiftLiveTileRule, DownwardsShiftLiveTileRule, RotateLiveTilesRule, DoNothingRule
+from match_rules import MatchARowRule, ShiftToFillRowEventRule
+from generator_rules import DropElementSetRule
 from provider import RandomRepeatingQueueElementProvider
+from gravity_rules import DownwardGravityRule
+
 from constants import Color
-from shift_rules import ShiftLiveTilesRule, ShiftDirection, ShiftStaticTilesRule
 
 if TYPE_CHECKING:
     pass
+
 
 class TetrisTile(GameElement):
     def __init__(self, *, name: str, color: Color):
@@ -87,40 +90,21 @@ l_block.add_element(orange_tile, Coordinate(0, 1))
 l_block.add_element(orange_tile, Coordinate(0, 2))
 l_block.add_element(orange_tile, Coordinate(1, 2))
 
-class LeftRightHandler(UserInputRule):
-    VALID_INPUT_SET = frozenset([ShiftDirection.LEFT, ShiftDirection.RIGHT])
 
-    def __init__(self):
-        self._live_shifter = ShiftLiveTilesRule()
-        self._live_shifter.set_shift_amount(1)
-
-    def handle_input(self, board: Board, *, event: Union[DirectionButton, ActionButton]):
-        if event not in LeftRightHandler.VALID_INPUT_SET:
-            return
-
-        if event == DirectionButton.LEFT:
-            self._live_shifter.set_shift_direction(ShiftDirection.LEFT)
-        elif event == DirectionButton.RIGHT:
-            self._live_shifter.set_shift_direction(ShiftDirection.RIGHT)
-
-        self._live_shifter.move_tiles(board)
-
-
-class DefaultHandler(UserInputRule):
-
-    def handle_input(self, board: Board, *, event: Union[DirectionButton, ActionButton]):
-        pass
-
-
-if __name__ == '__main__':
-    game = Game()
-    board = Board(height=7, width=9, player_id=5)
-    controller = KeyboardController()
-
+def apply_tetris_rule(board: Board):
     # User input rules
-    board.add_user_input_rule(LeftRightHandler(), input_set={DirectionButton.LEFT, DirectionButton.RIGHT})
-    board.add_user_input_rule(DefaultHandler(), input_set={DirectionButton.UP, DirectionButton.DOWN,
-                                                           ActionButton.PRIMARY, ActionButton.SECONDARY})
+    board.add_user_input_rule(HorizontalShiftLiveTileRule(), input_set={DirectionButton.LEFT, DirectionButton.RIGHT})
+    board.add_user_input_rule(DownwardsShiftLiveTileRule(), input_set={DirectionButton.DOWN})
+    board.add_user_input_rule(DoNothingRule(), input_set={DirectionButton.UP})
+    board.add_user_input_rule(RotateLiveTilesRule(), input_set={ActionButton.PRIMARY, ActionButton.SECONDARY})
+
+    # Tile matching rules
+    match_rule = MatchARowRule()
+    board.set_tile_match_rule(match_rule)
+
+    # Match event rules
+    match_event = ShiftToFillRowEventRule()
+    board.add_match_event_rule(match_event)
 
     # Board tile generation rules
     generator = DropElementSetRule()
@@ -135,29 +119,25 @@ if __name__ == '__main__':
     generator.set_provider(tetris_tile_provider)
     board.set_tile_generator_rule(generator)
 
-    # Tile Movement Rule
-    static_move_down_rule = ShiftStaticTilesRule()
-    static_move_down_rule.set_shift_amount(1)
-    static_move_down_rule.set_shift_direction(ShiftDirection.DOWN)
-    static_move_down_rule.enable_tile_movement()
-    board.set_static_tile_move_rule(static_move_down_rule)
+    # Tile Gravity Rule
+    gravity_rule = DownwardGravityRule()
+    gravity_rule.set_update_rate(time_ms=2500)
+    board.set_gravity_rule(gravity_rule)
 
-    live_move_horizontal_rule = ShiftLiveTilesRule()
-    live_move_horizontal_rule.set_shift_amount(1)
-    live_move_horizontal_rule.set_shift_direction(ShiftDirection.DOWN)
-    live_move_horizontal_rule.enable_tile_movement()
-    board.set_live_tile_move_rule(live_move_horizontal_rule)
+
+if __name__ == '__main__':
+    game = Game()
+
+    board = Board(height=30, width=10, player_id=5)
+    apply_tetris_rule(board)
+
+    controller = KeyboardController()
 
     # Game visual setup
     game.bind(controller, board)
+
     # tkinter specific
     controller.bind_to_window(game.get_window())
-
-    # while True:
-    #     board.update()
-
-    Clock.set_game(game)
-    Clock.set_update_rate(2)
 
     game.start()
 

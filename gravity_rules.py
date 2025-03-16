@@ -72,7 +72,7 @@ class DownwardGravityRule(GravityRule):
 
             # Generate new tetris piece - using a function from main.py
             # The function itself remains in main.py, we just call it from here
-            from main import generate_centered_piece
+            from input_rules import generate_centered_piece
             new_piece = generate_centered_piece(board)
             if new_piece:
                 board.set_live_tile(new_piece)

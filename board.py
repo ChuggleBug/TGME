@@ -1,8 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+from constants import Color
 from structures import Matrix
-from rules import UserInputRuleSet, GravityRule
+from rules import UserInputRuleSet, GravityRule, MatchEventRule
 
 if TYPE_CHECKING:
     from typing import List, Set, Optional, Iterable
@@ -48,6 +49,26 @@ class TileElement:
         """
         return self._elements.copy()  # Return a copy to prevent external modification
 
+    def apply_destroy(self):
+        """
+        Applies a destroy effect to this tile set.
+        If any game element has do_block_destroy, then only the game element is destroyed
+        """
+        # check if any element blocks a destroy
+        for element in self._elements:
+            if element.do_block_destroy:
+                self._elements.remove(element)
+                return
+        # clear the tile element set
+        self._elements = []
+
+    def has_colors(self):
+        return any(map(lambda element: element.supports_color, self._elements))
+
+    def get_colors(self) -> List[Color]:
+        return [element.element_color for element in self._elements if element.supports_color]
+
+
 class Board:
     def __init__(self, height: int, width: int, player_id: int):
         self._tiles: Matrix[TileElement] = Matrix(rows=height, cols=width, initializer=lambda: TileElement())
@@ -56,7 +77,7 @@ class Board:
         self._live_tiles: Optional[ElementSet] = None
         self._input_rules: List[UserInputRuleSet] = []
         self._static_move_rule: Optional[TileMovementRule] = None
-        # self._live_move_rule: Optional[TileMovementRule] = None
+        self._match_events: List[MatchEventRule] = []
         self._gravity_rule: Optional[GravityRule] = None
         self._player_id = player_id
 
@@ -89,6 +110,9 @@ class Board:
 
     def set_gravity_rule(self, gravity_rule: GravityRule):
         self._gravity_rule = gravity_rule
+
+    def add_match_event_rule(self, match_event: MatchEventRule):
+        self._match_events.append(match_event)
 
     def get_user_input_rules(self) -> Iterable[UserInputRuleSet]:
         return self._input_rules
@@ -130,10 +154,12 @@ class Board:
         self._try_apply_gravity_rule(time_ms)
 
     def _try_apply_match_rule(self):
-        if self._match_rule is None or ( matches := self._match_rule.check_matches(self) ) is None:
+        if self._match_rule is None:
             return
-        for pair in matches.get_element_pairs():
-            pass
+        destroyed_tiles = self._match_rule.check_matches(self)
+        if len(destroyed_tiles) > 0:
+            for event in self._match_events:
+                event.trigger(self, destroyed_tiles)
 
     def _try_apply_generate_rule(self):
         if self._generator_rule is None or ( generated_tiles := self._generator_rule.produce_tiles(self) ) is None:
