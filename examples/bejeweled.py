@@ -132,21 +132,31 @@ def apply_bejeweled_rule(board: Board):
 
 
 if __name__ == '__main__':
-    # Constructors
     game = Game()
-    board = Board(height=7, width=7)
-    user = User.load_from_file('test_user1', password='test_user1')
 
-    controller = KeyboardController()
-    controller.set_keybinds(user.get_keyboard_keybinds())
+    board1 = Board(height=10, width=10)
+    apply_bejeweled_rule(board1)
+    game.add_board(board1)
 
-    apply_bejeweled_rule(board)
+    board2 = Board(height=10, width=10)
+    apply_bejeweled_rule(board2)
+    game.add_board(board2)
 
-    # Associated input rules for the board will now be executed from the associated controller
-    game.bind(controller, board)
+    user1 = User.load_from_file('test_user1', password='test_user1')
+    user2 = User.load_from_file('test_user2', password='test_user2')
 
+    controller1 = KeyboardController()
+    controller1.set_keybinds(user1.get_keyboard_keybinds())
     # tkinter specific
-    controller.bind_to_window(game.get_window())
+    controller1.bind_to_board_window(game.get_window())
+    controller1.setup_controller()
 
-    # Start game
+    controller2 = KeyboardController()
+    controller2.set_keybinds(user2.get_keyboard_keybinds())
+    # tkinter specific
+    controller2.bind_to_board_window(game.get_window())
+    controller2.setup_controller()
+
+    game.bind(controller1, board_index=0)
+    game.bind(controller2, board_index=1)
     game.start()
