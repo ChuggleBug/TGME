@@ -2,6 +2,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from game import Game
 from board import Board
 from board_elements import GameElement, RelativeElementSet, Coordinate

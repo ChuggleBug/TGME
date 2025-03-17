@@ -47,8 +47,8 @@ class Game:
     def add_board(self, board: Board):
         canvas = tk.Canvas(self._window, width=500, height=500, bg=TK_COLOR_MAP[Color.BLACK])
         self._boards.append(BoardWindow(board, canvas))
-        canvas.pack()
-
+        canvas.pack(side=tk.LEFT, padx=10)
+        
     def get_board(self, index: int, /) -> Board:
         if index not in range(len(self._boards)):
             raise IndexError
