@@ -12,8 +12,8 @@ from match_rules import MatchARowRule, ShiftToFillRowEventRule
 from generator_rules import DropElementSetRule
 from provider import RandomRepeatingQueueElementProvider
 from gravity_rules import DownwardGravityRule
-
 from constants import Color
+from user import User
 
 if TYPE_CHECKING:
     pass
@@ -130,10 +130,12 @@ if __name__ == '__main__':
 
     # TODO: typically the tetris board is 40x10, but the GUI
     #  gets weird for larger sizes. Maybe someone can fix that?
-    board = Board(height=30, width=10, player_id=5)
+    board = Board(height=30, width=10)
     apply_tetris_rule(board)
+    user = User.load_from_file('test_user1', password='test_user1')
 
     controller = KeyboardController()
+    controller.set_keybinds(user.get_keyboard_keybinds())
 
     # Game visual setup
     game.bind(controller, board)

@@ -1,18 +1,34 @@
+
+from __future__ import annotations
 from enum import Enum, auto
-from typing import Any, Optional, Callable
+from typing import Any, Optional, Callable, Dict
 from abc import ABC, abstractmethod
 import tkinter as tk
 
 class DirectionButton(Enum):
-    UP = auto()
-    DOWN = auto()
-    LEFT = auto()
-    RIGHT = auto()
+    UP = 'UP'
+    DOWN = 'DOWN'
+    LEFT = 'LEFT'
+    RIGHT = 'RIGHT'
 
+    def __str__(self):
+        return self.value
+
+    @staticmethod
+    def as_set() -> frozenset[DirectionButton]:
+        return frozenset([DirectionButton.UP, DirectionButton.DOWN,
+                          DirectionButton.LEFT, DirectionButton.RIGHT])
 
 class ActionButton(Enum):
-    PRIMARY = auto()
-    SECONDARY = auto()
+    PRIMARY = 'PRIMARY'
+    SECONDARY = 'SECONDARY'
+
+    @staticmethod
+    def as_set() -> frozenset[ActionButton]:
+        return frozenset([ActionButton.PRIMARY, ActionButton.SECONDARY])
+
+    def __str__(self):
+        return self.value
 
 
 class ButtonController(ABC):
@@ -40,47 +56,57 @@ class StateError(BaseException):
 
 
 class KeyboardController(ButtonController):
+    """
+    Default keymaps for tkinter
+    """
     UP_KEY = "Up"
     DOWN_KEY = "Down"
     LEFT_KEY = "Left"
     RIGHT_KEY = "Right"
-    PRIMARY_KEY = "space" # TODO: Why is this one work when lowercase???
-    SECONDARY_KEY = "Return" # TODO: This might be different on Windows???
+    PRIMARY_KEY = "space"
+    SECONDARY_KEY = "Return"
 
     def __init__(self):
         super().__init__()
         self._window: Optional[tk.Tk] = None
+        self._keybinds_set: bool = False
+
+    def export_keybind(self) -> Dict[str, str]:
+        return self._keybinds
+
+    def set_keybinds(self, keybinds: Dict[str, str]):
+        self._keybinds = keybinds
+        self._keybinds_set = True
 
     def bind_to_window(self, window: tk.Tk):
         self._window = window
 
     def _handle_button_event(self, event: tk.Event):
-        if event.keysym == KeyboardController.UP_KEY:
+        if event.keysym == self._keybinds['UP']:
             self._direction_fn_map[DirectionButton.UP](DirectionButton.UP)
 
-        elif event.keysym == KeyboardController.DOWN_KEY:
+        elif event.keysym == self._keybinds['DOWN']:
             self._direction_fn_map[DirectionButton.DOWN](DirectionButton.DOWN)
 
-        elif event.keysym == KeyboardController.LEFT_KEY:
+        elif event.keysym == self._keybinds['LEFT']:
             self._direction_fn_map[DirectionButton.LEFT](DirectionButton.LEFT)
 
-        elif event.keysym == KeyboardController.RIGHT_KEY:
+        elif event.keysym == self._keybinds['RIGHT']:
             self._direction_fn_map[DirectionButton.RIGHT](DirectionButton.RIGHT)
 
-        elif event.keysym == KeyboardController.PRIMARY_KEY:
+        elif event.keysym == self._keybinds['PRIMARY']:
             self._action_fn_map[ActionButton.PRIMARY](ActionButton.PRIMARY)
 
-        elif event.keysym == KeyboardController.SECONDARY_KEY:
+        elif event.keysym == self._keybinds['SECONDARY']:
             self._action_fn_map[ActionButton.SECONDARY](ActionButton.SECONDARY)
 
     def pause_controller(self):
         self._window.unbind("<KeyPress>")
 
     def start_controller(self):
+        if not self._keybinds_set:
+            raise StateError('Keyboard controller keybinds were not set')
         if self._window is None:
             raise StateError("Controller was not bound to a window")
 
         self._window.bind("<KeyPress>", self._handle_button_event)
-
-
-# create another keyboard controller for player 2 like WASD instead of up, down, left and right

@@ -1,15 +1,16 @@
 from typing import TYPE_CHECKING
 
-from generator_rules import FillAllSpotsRule, FillEmptyTopRowSpotsRule, DropElementSetRule
+from generator_rules import FillAllSpotsRule, FillEmptyTopRowSpotsRule
 from input_rules import CursorApplyDirectionRule, CursorApplySelectionRule
 from match_rules import MatchNOfColorRule
 from game import Game
 from button_controller import KeyboardController, DirectionButton, ActionButton
 from board import Board
-from board_elements import RelativeElementSet, BoardElementSet, GameElement, Coordinate
-from provider import WeightedRandomElementProvider, UniformRandomElementProvider
+from board_elements import  GameElement
+from provider import UniformRandomElementProvider
 from constants import Color
 from shift_rules import ShiftStaticTilesRule, ShiftDirection
+from user import User
 
 if TYPE_CHECKING:
     pass
@@ -86,8 +87,11 @@ def apply_bejeweled_rule(board: Board):
 if __name__ == '__main__':
     # Constructors
     game = Game()
-    board = Board(height=7, width=7, player_id=5)
+    board = Board(height=7, width=7)
+    user = User.load_from_file('test_user1', password='test_user1')
+
     controller = KeyboardController()
+    controller.set_keybinds(user.get_keyboard_keybinds())
 
     apply_bejeweled_rule(board)
 
