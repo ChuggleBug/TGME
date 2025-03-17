@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+import math
 
 from generator_rules import FillAllSpotsRule, FillEmptyTopRowSpotsRule
 from input_rules import CursorApplyDirectionRule, CursorApplySelectionRule
@@ -26,9 +27,55 @@ class Gem(GameElement):
         # Get the corresponding tkinter color
         from constants import TK_COLOR_MAP
         tile_color = TK_COLOR_MAP.get(self.element_color, "white")
-        # Draw a colored rectangle with white border
-        canvas.create_rectangle(x1, y1, x2, y2, fill=tile_color, outline="white", width=3)
-
+        if self.element_name == 'GemRed':
+            #Diamond
+            tile_width = x2 - x1
+            tile_height = y2 - y1
+            center_x = x1 + tile_width // 2
+            center_y = y1 + tile_height // 2
+            points = [
+                (center_x, y1 + 5),
+                (x2 - 5, center_y),
+                (center_x, y2 - 5), 
+                (x1 + 5, center_y)
+            ]
+            canvas.create_polygon(points, fill=tile_color, outline="white", width=2)
+        elif self.element_name == 'GemOrange':
+            #Circle
+            canvas.create_oval(x1 + 5, y1 + 5, x2 - 5, y2 - 5, fill=tile_color, outline="white", width=2)
+        elif self.element_name == 'GemGreen':
+            #Triangle
+            center_x = (x1 + x2) // 2
+            points = [
+                (center_x, y1 + 10),
+                (x1 + 10, y2 - 10),
+                (x2 - 10, y2 - 10)
+            ]
+            canvas.create_polygon(points, fill=tile_color, outline="white", width=2)
+        elif self.element_name == 'GemBlue':
+            #Pentagon
+            center_x = (x1 + x2) // 2
+            center_y = (y1 + y2) // 2
+            radius = min((x2 - x1), (y2 - y1)) // 2.5
+            points = []
+            for i in range(5):
+                angle = math.radians(90 + i * 72)
+                px = center_x + radius * math.cos(angle)
+                py = center_y - radius * math.sin(angle)
+                points.append((px, py))
+            canvas.create_polygon(points, fill=tile_color, outline="white", width=2)
+        elif self.element_name == 'GemPurple':
+            #Upsidedown Triangle
+            center_x = (x1 + x2) // 2
+            points = [
+                (x1 + 10, y1 + 10),
+                (x2 - 10, y1 + 10),
+                (center_x, y2 - 10)
+            ]
+            canvas.create_polygon(points, fill=tile_color, outline="white", width=2)
+        else:
+            #Square
+            canvas.create_rectangle(x1 + 10, y1 + 10, x2 - 10, y2 - 10, fill=tile_color, outline="white", width=3)
 
 # class Blocker(GameElement):
 #     def __init__(self):
