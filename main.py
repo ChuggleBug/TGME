@@ -183,7 +183,7 @@ if __name__ == "__main__":
     
     # Create game components
     game = Game()
-    board = Board(height=board_size[0], width=board_size[1], player_id=1)
+    board = Board(height=board_size[0], width=board_size[1])
     controller = KeyboardController()
     
     # Bind controller to window

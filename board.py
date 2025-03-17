@@ -110,7 +110,7 @@ class TileElement:
 
 
 class Board:
-    def __init__(self, height: int, width: int, player_id: int):
+    def __init__(self, height: int, width: int):
         self._tiles: Matrix[TileElement] = Matrix(rows=height, cols=width, initializer=lambda: TileElement())
         self._match_rule: Optional[TileMatchRule] = None
         self._generator_rule: Optional[TileGeneratorRule] = None
@@ -120,10 +120,6 @@ class Board:
         self._match_events: List[MatchEventRule] = []
         self._gravity_rule: Optional[GravityRule] = None
         self._cursor: Optional[Cursor] = None
-        self._player_id = player_id
-
-    def get_player_id(self):
-       return self._player_id
 
     def get_live_tiles(self) -> Optional[BoardElementSet]:
         return self._live_tiles
