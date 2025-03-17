@@ -51,31 +51,31 @@ class Cursor:
 
     def draw(self, canvas, cell_height, cell_width):
         pp = self.get_primary_position()
-
-        primary_top_left = (pp.x * cell_height, pp.y * cell_width)
-        primary_top_right = (pp.x * cell_height + cell_width, pp.y * cell_width)
-        primary_bottom_left = (pp.x * cell_height, pp.y * cell_width + cell_height)
-        primary_bottom_right = (pp.x * cell_height + cell_width, pp.y * cell_width + cell_height)
+        x1, y1 = pp.x * cell_width, pp.y * cell_height
+        x2, y2 = x1 + cell_width, y1 + cell_height
 
         if self.is_in_movement_state():
-            canvas.create_line(primary_top_left, primary_bottom_right, fill = TK_COLOR_MAP[Color.BLACK])
-            canvas.create_line(primary_top_right, primary_bottom_left, fill = TK_COLOR_MAP[Color.BLACK])
+            canvas.create_rectangle(x1, y1, x2, y2, outline="white", width=3, fill="")
 
         if self.is_in_swapping_state():
             # Primary X
-            canvas.create_line(primary_top_left, primary_bottom_right, fill = TK_COLOR_MAP[Color.BLACK], width = 3)
-            canvas.create_line(primary_top_right, primary_bottom_left, fill = TK_COLOR_MAP[Color.BLACK], width = 3)
+            canvas.create_rectangle(x1, y1, x2, y2, outline="white", width=3, fill="")
 
             if self.has_secondary_position():
                 sp = self.get_secondary_position()
-                secondary_top_left = (sp.x * cell_height, sp.y * cell_width)
-                secondary_top_right = (sp.x * cell_height + cell_width, sp.y * cell_width)
-                secondary_bottom_left = (sp.x * cell_height, sp.y * cell_width + cell_height)
-                secondary_bottom_right = (sp.x * cell_height + cell_width, sp.y * cell_width + cell_height)
+                w1, u1 = sp.x * cell_width, sp.y * cell_height
+                w2, u2 = w1 + cell_width, u1 + cell_height
 
                 #Secondary X
-                canvas.create_line(secondary_top_left, secondary_bottom_right, fill = "black")
-                canvas.create_line(secondary_top_right, secondary_bottom_left, fill = "black")
+                corner_length = 15
+                canvas.create_line(w1, u1, w1 + corner_length, u1, fill="gray60", width=3)
+                canvas.create_line(w1, u1, w1, u1 + corner_length, fill="gray60", width=3)
+                canvas.create_line(w2, u1, w2 - corner_length, u1, fill="gray60", width=3)
+                canvas.create_line(w2, u1, w2, u1 + corner_length, fill="gray60", width=3)
+                canvas.create_line(w1, u2, w1 + corner_length, u2, fill="gray60", width=3)
+                canvas.create_line(w1, u2, w1, u2 - corner_length, fill="gray60", width=3)
+                canvas.create_line(w2, u2, w2 - corner_length, u2, fill="gray60", width=3)
+                canvas.create_line(w2, u2, w2, u2 - corner_length, fill="gray60", width=3)
 
 
 
