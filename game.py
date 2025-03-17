@@ -48,7 +48,8 @@ class Game:
         canvas = tk.Canvas(self._window, width=500, height=500, bg=TK_COLOR_MAP[Color.BLACK])
         self._boards.append(BoardWindow(board, canvas))
         canvas.pack(side=tk.LEFT, padx=10)
-        
+        self._window.update()
+
     def get_board(self, index: int, /) -> Board:
         if index not in range(len(self._boards)):
             raise IndexError
@@ -76,8 +77,8 @@ class Game:
 
         # Instead of using min to get square cells, calculate separate dimensions
         # This will stretch tiles to fill the entire board area
-        cell_width = total_board_width // board_width
-        cell_height = total_board_height // board_height
+        cell_width = total_board_width / board_width
+        cell_height = total_board_height / board_height
 
         # First, clear the canvas to prevent overlapping elements
         canvas.delete("all")
