@@ -59,21 +59,21 @@ class DownwardGravityRule(GravityRule):
             # self._lock_live_tiles(board)
 
     # not used since there was method in Board
-    def _lock_live_tiles(self, board: Board):
-        """Convert live tiles to static tiles when they can't move down anymore."""
-        if board.has_live_tiles():
-            live_tiles = board.get_live_tiles()
-
-            # Add each live tile to the static board
-            for pair in live_tiles.get_element_pairs():
-                board.get_tile_at(pair.coordinate).add_game_element(pair.element)
-
-            # Clear the live tiles
-            board.set_live_tile(BoardElementSet())
-
-            # Generate new tetris piece - using a function from old_main.py
-            # The function itself remains in old_main.py, we just call it from here
-            from input_rules import generate_centered_piece
-            new_piece = generate_centered_piece(board)
-            if new_piece:
-                board.set_live_tile(new_piece)
+    # def _lock_live_tiles(self, board: Board):
+    #     """Convert live tiles to static tiles when they can't move down anymore."""
+    #     if board.has_live_tiles():
+    #         live_tiles = board.get_live_tiles()
+    #
+    #         # Add each live tile to the static board
+    #         for pair in live_tiles.get_element_pairs():
+    #             board.get_tile_at(pair.coordinate).add_game_element(pair.element)
+    #
+    #         # Clear the live tiles
+    #         board.set_live_tile(BoardElementSet())
+    #
+    #         # Generate new tetris piece - using a function from old_main.py
+    #         # The function itself remains in old_main.py, we just call it from here
+    #         from input_rules import generate_centered_piece
+    #         new_piece = generate_centered_piece(board)
+    #         if new_piece:
+    #             board.set_live_tile(new_piece)

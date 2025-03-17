@@ -251,9 +251,9 @@ class Board:
     def _try_apply_gravity_rule(self, time_ms: int):
         if self._gravity_rule is not None:
             self._gravity_rule.update(self, current_time=time_ms)
-
-    def spawn_tiles(self):
-        if self._generator_rule:
-            generated_tiles = self._generator_rule.produce_tiles(self)
-            if generated_tiles:
-                print(f"Generated {len(generated_tiles.get_element_pairs())} tiles")
+    #
+    # def spawn_tiles(self):
+    #     if self._generator_rule:
+    #         generated_tiles = self._generator_rule.produce_tiles(self)
+    #         if generated_tiles:
+    #             print(f"Generated {len(generated_tiles.get_element_pairs())} tiles")

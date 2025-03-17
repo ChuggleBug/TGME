@@ -8,7 +8,6 @@ from pathlib import Path
 import json
 import copy
 
-import button_controller
 from button_controller import DirectionButton, ActionButton, DEFAULT_KEYBOARD_KEYBINDS
 
 if TYPE_CHECKING:
