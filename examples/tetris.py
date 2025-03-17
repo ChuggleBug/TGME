@@ -128,20 +128,34 @@ def apply_tetris_rule(board: Board):
 if __name__ == '__main__':
     game = Game()
 
-    # TODO: typically the tetris board is 40x10, but the GUI
-    #  gets weird for larger sizes. Maybe someone can fix that?
-    board = Board(height=30, width=10)
-    apply_tetris_rule(board)
-    user = User.load_from_file('test_user2', password='test_user2')
+    board1 = Board(height=30, width=10)
+    apply_tetris_rule(board1)
+    game.add_board(board1)
 
-    controller = KeyboardController()
-    controller.set_keybinds(user.get_keyboard_keybinds())
+    board2 = Board(height=30, width=10)
+    apply_tetris_rule(board2)
+    game.add_board(board2)
+
+    user1 = User.load_from_file('test_user1', password='test_user1')
+    user2 = User.load_from_file('test_user2', password='test_user2')
+
+    controller1 = KeyboardController()
+    controller1.set_keybinds(user1.get_keyboard_keybinds())
+    # tkinter specific
+    controller1.bind_to_board_window(game.get_window())
+    controller1.setup_controller()
+
+    controller2 = KeyboardController()
+    controller2.set_keybinds(user2.get_keyboard_keybinds())
+    # tkinter specific
+    controller2.bind_to_board_window(game.get_window())
+    controller2.setup_controller()
 
     # Game visual setup
-    game.bind(controller, board)
 
-    # tkinter specific
-    controller.bind_to_window(game.get_window())
+    game.bind(controller1, board_index=0)
+    game.bind(controller2, board_index=1)
+
 
     game.start()
 

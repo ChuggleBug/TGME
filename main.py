@@ -62,9 +62,7 @@ def login_or_create_user() -> User:
         return User.load_from_file(username, password=password)
 
 
-
-
-if __name__ == '__main__':
+def main():
     print('Welcome to the TGME.')
     print('There are currently two games:')
     print('\t- Tetris')
@@ -102,3 +100,6 @@ if __name__ == '__main__':
     print()
     print(f'Starting {game_name}...')
     game.start()
+
+if __name__ == '__main__':
+    main()

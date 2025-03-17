@@ -1,9 +1,12 @@
 
 from __future__ import annotations
 from enum import Enum
-from typing import Any, Optional, Callable, Dict
+from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 import tkinter as tk
+
+if TYPE_CHECKING:
+    from typing import Any, Optional, Callable, Dict, List
 
 DEFAULT_KEYBOARD_KEYBINDS = {
     'UP' : 'Up',
@@ -64,6 +67,33 @@ class StateError(BaseException):
     pass
 
 
+class _KeyboardControllerManager:
+    _keyboard_methods: List[Callable[[tk.Event], None]] = []
+    is_bound_to_window: bool = False
+    _window_to_bind: Optional[tk.Tk] = None
+
+    @staticmethod
+    def set_window_to_bind(window: tk.Tk):
+        if _KeyboardControllerManager._window_to_bind is None:
+            _KeyboardControllerManager._window_to_bind = window
+
+    @staticmethod
+    def add_keyboard_input_handler(handler: Callable[[tk.Event], None]):
+        _KeyboardControllerManager._keyboard_methods.append(handler)
+
+    @staticmethod
+    def run_methods(event: tk.Event):
+        for method in _KeyboardControllerManager._keyboard_methods:
+            method(event)
+
+    @staticmethod
+    def start():
+        if _KeyboardControllerManager._window_to_bind is None:
+            raise StateError("The controllers were not bound to a window")
+        if not _KeyboardControllerManager.is_bound_to_window:
+            _KeyboardControllerManager._window_to_bind.bind('<KeyPress>', _KeyboardControllerManager.run_methods)
+
+
 class KeyboardController(ButtonController):
     """
     Default keymaps for tkinter
@@ -80,35 +110,42 @@ class KeyboardController(ButtonController):
         self._keybinds = keybinds
         self._keybinds_set = True
 
-    def bind_to_window(self, window: tk.Tk):
-        self._window = window
+    def bind_to_board_window(self, window: tk.Tk):
+        _KeyboardControllerManager.set_window_to_bind(window)
 
     def _handle_button_event(self, event: tk.Event):
         if event.keysym == self._keybinds['UP']:
+            print(f"Keyboard {id(self)}: UP")
             self._direction_fn_map[DirectionButton.UP](DirectionButton.UP)
 
         elif event.keysym == self._keybinds['DOWN']:
+            print(f"Keyboard {id(self)}: DOWN")
             self._direction_fn_map[DirectionButton.DOWN](DirectionButton.DOWN)
 
         elif event.keysym == self._keybinds['LEFT']:
+            print(f"Keyboard {id(self)}: LEFT")
             self._direction_fn_map[DirectionButton.LEFT](DirectionButton.LEFT)
 
         elif event.keysym == self._keybinds['RIGHT']:
+            print(f"Keyboard {id(self)}: RIGHT")
             self._direction_fn_map[DirectionButton.RIGHT](DirectionButton.RIGHT)
 
         elif event.keysym == self._keybinds['PRIMARY']:
+            print(f"Keyboard {id(self)}: PRIMARY")
             self._action_fn_map[ActionButton.PRIMARY](ActionButton.PRIMARY)
 
         elif event.keysym == self._keybinds['SECONDARY']:
+            print(f"Keyboard {id(self)}: SECONDARY")
             self._action_fn_map[ActionButton.SECONDARY](ActionButton.SECONDARY)
 
     def pause_controller(self):
         self._window.unbind("<KeyPress>")
 
+    def setup_controller(self):
+        _KeyboardControllerManager.add_keyboard_input_handler(lambda event: self._handle_button_event(event))
+
     def start_controller(self):
         if not self._keybinds_set:
             raise StateError('Keyboard controller keybinds were not set')
-        if self._window is None:
-            raise StateError("Controller was not bound to a window")
+        _KeyboardControllerManager.start()
 
-        self._window.bind("<KeyPress>", self._handle_button_event)
