@@ -5,7 +5,7 @@ from typing import Callable
 
 from button_controller import KeyboardController
 from examples.tetris import apply_tetris_rule
-from TGME.examples.bejeweled import apply_bejeweled_rule
+from examples.bejeweled import apply_bejeweled_rule
 from board import Board
 from game import Game
 from user import User
