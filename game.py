@@ -102,6 +102,13 @@ class Game:
                 # Draw the live tile (similar to static tiles)
                 element = pair.element
                 element.draw(self.canvas, x1, y1, x2, y2)
+
+        # Draw cursor on board if supported by game
+        if self._board.has_cursor():
+            self._board.get_cursor().draw(self.canvas, cell_height, cell_width)
+
+
+
     
     def update(self):
         """Update game state and redraw."""

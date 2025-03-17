@@ -1,4 +1,3 @@
-from mmap import PROT_WRITE
 from typing import Set, Iterable, List
 
 from board import Board, TileElement

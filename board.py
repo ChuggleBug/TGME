@@ -5,6 +5,7 @@ from constants import Color
 from structures import Matrix
 from rules import UserInputRuleSet, GravityRule, MatchEventRule
 from board_elements import Coordinate
+from constants import TK_COLOR_MAP
 
 if TYPE_CHECKING:
     from typing import List, Set, Optional, Iterable
@@ -50,8 +51,35 @@ class Cursor:
 
     # TODO: Change the implementation to support drawing
     #  specifications are provided
-    def draw(self):
-        ...
+    def draw(self, canvas, cell_height, cell_width):
+        pp = self.get_primary_position()
+
+        primary_top_left = (pp.x * cell_height, pp.y * cell_width)
+        primary_top_right = (pp.x * cell_height + cell_width, pp.y * cell_width)
+        primary_bottom_left = (pp.x * cell_height, pp.y * cell_width + cell_height)
+        primary_bottom_right = (pp.x * cell_height + cell_width, pp.y * cell_width + cell_height)
+
+        if self.is_in_movement_state():
+            canvas.create_line(primary_top_left, primary_bottom_right, fill = "black")
+            canvas.create_line(primary_top_right, primary_bottom_left, fill = "black")
+
+        if self.is_in_swapping_state():
+            # Primary X
+            canvas.create_line(primary_top_left, primary_bottom_right, fill = "black", width = 3)
+            canvas.create_line(primary_top_right, primary_bottom_left, fill = "black", width = 3)
+
+            if self.has_secondary_position():
+                sp = self.get_secondary_position()
+                secondary_top_left = (sp.x * cell_height, sp.y * cell_width)
+                secondary_top_right = (sp.x * cell_height + cell_width, sp.y * cell_width)
+                secondary_bottom_left = (sp.x * cell_height, sp.y * cell_width + cell_height)
+                secondary_bottom_right = (sp.x * cell_height + cell_width, sp.y * cell_width + cell_height)
+
+                #Secondary X
+                canvas.create_line(secondary_top_left, secondary_bottom_right, fill = "black")
+                canvas.create_line(secondary_top_right, secondary_bottom_left, fill = "black")
+
+
 
 class TileElement:
     def __init__(self):
