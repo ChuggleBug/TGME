@@ -64,7 +64,6 @@ class DropElementSetRule(TileGeneratorRule):
         return Coordinate(x=(board.get_width() // 2) - (tile_set.get_width() - (board.get_width() % 2)) // 2, y=0)
 
 
-
 class FillAllSpotsRule(TileGeneratorRule):
     def __init__(self):
         self._provider: Optional[ElementProvider[GameElement]] = None
@@ -80,5 +79,4 @@ class FillAllSpotsRule(TileGeneratorRule):
                 if board.get_tile_at(target_coordinate).can_support_tile_spawn():
                     new_tile = self._provider.provide()
                     generated_tiles.add_element(new_tile, target_coordinate)
-                #print(f"{tile._elements[0].type} ({row}, {col})")
         return generated_tiles if generated_tiles.has_elements() else None

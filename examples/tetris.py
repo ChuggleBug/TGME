@@ -132,7 +132,7 @@ if __name__ == '__main__':
     #  gets weird for larger sizes. Maybe someone can fix that?
     board = Board(height=30, width=10)
     apply_tetris_rule(board)
-    user = User.load_from_file('test_user1', password='test_user1')
+    user = User.load_from_file('test_user2', password='test_user2')
 
     controller = KeyboardController()
     controller.set_keybinds(user.get_keyboard_keybinds())

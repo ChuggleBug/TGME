@@ -1,8 +1,11 @@
-from typing import Set, Iterable, List
+from typing import TYPE_CHECKING
 
-from board import Board, TileElement
-from board_elements import Coordinate, BoardElementSet
+from board import Board
+from board_elements import Coordinate
 from rules import TileMatchRule, MatchEventRule
+
+if TYPE_CHECKING:
+    from typing import Iterable, List
 
 
 class MatchARowRule(TileMatchRule):

@@ -98,8 +98,6 @@ class RelativeElementSet(ElementSet):
         converted_set = BoardElementSet()
         for pair in self.get_element_pairs():
             converted_coords = pair.coordinate + coordinate
-            # if converted_coords.x > board.get_width() or converted_coords.y > board.get_height():
-            #     raise ValueError(f"{converted_coords} have elements outside of the bounds of the board [(0-0),({board.get_width()},{board.get_height()})]")
             converted_set.add_element(pair.element, converted_coords)
 
         return converted_set
@@ -165,7 +163,6 @@ class BoardElementSet(ElementSet):
         return element_set
 
     def get_top_right(self) -> Coordinate:
-        # top right = lowest x, lowest y
         return Coordinate(
             x=min(map(lambda pair: pair.coordinate.x, self.get_element_pairs())),
             y=min(map(lambda pair: pair.coordinate.y, self.get_element_pairs())),

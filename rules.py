@@ -1,4 +1,3 @@
-# CONCRETE CLASSES SHOULD NOT GO HERE
 
 from __future__ import annotations
 from abc import ABC, abstractmethod

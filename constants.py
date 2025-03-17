@@ -4,6 +4,7 @@ class Color(Enum):
     DEFAULT = auto()
     WHITE = auto()
     GRAY = auto()
+    BLACK = auto()
     RED = auto()
     GREEN = auto()
     BLUE = auto()
@@ -16,6 +17,7 @@ TK_COLOR_MAP = {
     Color.DEFAULT: '#FFFFFF',  # White
     Color.WHITE: '#FFFFFF',    # White
     Color.GRAY: '#808080',     # Gray
+    Color.BLACK: '#000000',     # Gray
     Color.RED: '#FF0000',      # Red
     Color.GREEN: '#008000',    # Green
     Color.BLUE: '#0000FF',     # Blue

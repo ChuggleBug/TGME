@@ -1,4 +1,3 @@
-from turtledemo.sorting_animate import enable_keys
 from typing import Union
 
 from board import Board
@@ -14,7 +13,6 @@ class DoNothingRule(UserInputRule):
 
 class RotateLiveTilesRule(UserInputRule):
     def handle_input(self, board: Board, *, event: Union[DirectionButton, ActionButton]):
-        print("Trying to rotate")
         if not board.has_live_tiles():
             return
         if event not in {ActionButton.PRIMARY, ActionButton.SECONDARY}:
@@ -44,10 +42,8 @@ class HorizontalShiftLiveTileRule(UserInputRule):
         # Get the direction to move
         direction = None
         if event == DirectionButton.LEFT:
-            print("Moving Tetris block left")
             direction = Coordinate(-1, 0)
         elif event == DirectionButton.RIGHT:
-            print("Moving Tetris block right")
             direction = Coordinate(1, 0)
 
         if direction:
@@ -95,10 +91,9 @@ class DownwardsShiftLiveTileRule(UserInputRule):
 
         # Tetris pieces should only move down, not up
         if event == DirectionButton.DOWN:
-            print("Moving Tetris block down")
             self._move_live_tiles_down(board)
         elif event == DirectionButton.UP:
-            print("Up movement not allowed in Tetris")
+            pass
 
     def _move_live_tiles_down(self, board: Board):
         """Move the live tiles down if possible."""
@@ -135,112 +130,6 @@ class DownwardsShiftLiveTileRule(UserInputRule):
             # If can't move down, convert live tiles to static tiles
             board.lock_live_tiles_to_board()
 
-# I dont think we need any of this
-#
-#     def _lock_live_tiles(self, board: Board):
-#         """Convert live tiles to static tiles when they can't move down anymore."""
-#         if board.has_live_tiles():
-#             live_tiles = board.get_live_tiles()
-#
-#             # Add each live tile to the static board
-#             for pair in live_tiles.get_element_pairs():
-#                 board.get_tile_at(pair.coordinate).add_game_element(pair.element)
-#
-#             # Clear the live tiles
-#             board.set_live_tile(BoardElementSet())
-#
-#             # Generate new tetris piece
-#             new_piece = generate_centered_piece(board)
-#             if new_piece:
-#                 board.set_live_tile(new_piece)
-#
-#
-# def generate_centered_piece(board: Board):
-#     """
-#     Generate a new Tetris piece and center it at the top of the board.
-#     Returns the centered piece as a BoardElementSet or None if generation failed.
-#     """
-#     try:
-#         # Try to get a piece from the generator rule
-#         generated_elements = board._generator_rule.produce_tiles(board)
-#         if generated_elements is not None and len(generated_elements.get_element_pairs()) > 0:
-#             # Place the piece at the top center of the board
-#             centered_piece = BoardElementSet()
-#             center_x = board.get_width() // 2 - 1
-#
-#             # Check for collisions with existing blocks
-#             collision = False
-#             for pair in generated_elements.get_element_pairs():
-#                 new_x = center_x + pair.coordinate.x
-#                 new_y = pair.coordinate.y
-#
-#                 # Check if position is valid
-#                 if (new_x < 0 or new_x >= board.get_width() or
-#                     new_y < 0 or new_y >= board.get_height()):
-#                     collision = True
-#                     break
-#
-#                 # Check if position is already occupied
-#                 tile = board.get_tile_at(Coordinate(new_x, new_y))
-#                 if tile and tile.has_elements():
-#                     collision = True
-#                     break
-#
-#             # If no collision, create the centered piece
-#             if not collision:
-#                 for pair in generated_elements.get_element_pairs():
-#                     new_x = center_x + pair.coordinate.x
-#                     new_y = pair.coordinate.y
-#                     centered_piece.add_element(pair.element, Coordinate(new_x, new_y))
-#
-#                 print("New piece generated")
-#                 return centered_piece
-#             else:
-#                 print("Collision detected when placing new piece - game might be over")
-#                 return None
-#         else:
-#             print("Generator didn't produce pieces, creating fallback piece")
-#             # Create a fallback piece using one of our predefined pieces
-#             import random
-#             pieces = create_tetris_pieces()
-#             fallback_piece = random.choice(pieces)
-#
-#             # Center the fallback piece at the top of the board
-#             centered_piece = BoardElementSet()
-#             center_x = board.get_width() // 2 - 1
-#
-#             # Check for collisions with existing blocks
-#             collision = False
-#             for pair in fallback_piece.get_element_pairs():
-#                 new_x = center_x + pair.coordinate.x
-#                 new_y = pair.coordinate.y
-#
-#                 # Check if position is valid
-#                 if (new_x < 0 or new_x >= board.get_width() or
-#                     new_y < 0 or new_y >= board.get_height()):
-#                     collision = True
-#                     break
-#
-#                 # Check if position is already occupied
-#                 tile = board.get_tile_at(Coordinate(new_x, new_y))
-#                 if tile and tile.has_elements():
-#                     collision = True
-#                     break
-#
-#             # If no collision, create the centered piece
-#             if not collision:
-#                 for pair in fallback_piece.get_element_pairs():
-#                     new_x = center_x + pair.coordinate.x
-#                     new_y = pair.coordinate.y
-#                     centered_piece.add_element(pair.element, Coordinate(new_x, new_y))
-#
-#                 return centered_piece
-#             else:
-#                 print("Collision detected when placing fallback piece - game over")
-#                 return None
-#     except Exception as e:
-#         print(f"Error generating new piece: {e}")
-#         return None
 
 class CursorApplyDirectionRule(UserInputRule):
     def handle_input(self, board: Board, *, event: Union[DirectionButton, ActionButton]):

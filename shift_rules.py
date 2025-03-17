@@ -2,7 +2,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-# import copy
 from enum import Enum, auto
 
 from board_elements import ElementSet, Coordinate

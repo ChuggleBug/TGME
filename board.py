@@ -49,8 +49,6 @@ class Cursor:
     def set_swapping_state(self):
         self._is_in_swapping_state = True
 
-    # TODO: Change the implementation to support drawing
-    #  specifications are provided
     def draw(self, canvas, cell_height, cell_width):
         pp = self.get_primary_position()
 
@@ -60,13 +58,13 @@ class Cursor:
         primary_bottom_right = (pp.x * cell_height + cell_width, pp.y * cell_width + cell_height)
 
         if self.is_in_movement_state():
-            canvas.create_line(primary_top_left, primary_bottom_right, fill = "black")
-            canvas.create_line(primary_top_right, primary_bottom_left, fill = "black")
+            canvas.create_line(primary_top_left, primary_bottom_right, fill = TK_COLOR_MAP[Color.BLACK])
+            canvas.create_line(primary_top_right, primary_bottom_left, fill = TK_COLOR_MAP[Color.BLACK])
 
         if self.is_in_swapping_state():
             # Primary X
-            canvas.create_line(primary_top_left, primary_bottom_right, fill = "black", width = 3)
-            canvas.create_line(primary_top_right, primary_bottom_left, fill = "black", width = 3)
+            canvas.create_line(primary_top_left, primary_bottom_right, fill = TK_COLOR_MAP[Color.BLACK], width = 3)
+            canvas.create_line(primary_top_right, primary_bottom_left, fill = TK_COLOR_MAP[Color.BLACK], width = 3)
 
             if self.has_secondary_position():
                 sp = self.get_secondary_position()
@@ -251,9 +249,3 @@ class Board:
     def _try_apply_gravity_rule(self, time_ms: int):
         if self._gravity_rule is not None:
             self._gravity_rule.update(self, current_time=time_ms)
-    #
-    # def spawn_tiles(self):
-    #     if self._generator_rule:
-    #         generated_tiles = self._generator_rule.produce_tiles(self)
-    #         if generated_tiles:
-    #             print(f"Generated {len(generated_tiles.get_element_pairs())} tiles")

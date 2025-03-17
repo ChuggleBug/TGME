@@ -1,5 +1,5 @@
 import copy
-from typing import TypeVar, Generic, Type, Callable
+from typing import TypeVar, Generic, Callable
 
 T = TypeVar('T')
 

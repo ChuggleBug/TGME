@@ -6,7 +6,8 @@ import time
 
 from button_controller import ButtonController
 from board_elements import Coordinate
-from gravity_rules import DownwardGravityRule
+from constants import TK_COLOR_MAP
+from constants import Color
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -22,7 +23,7 @@ class Game:
         self._board: Optional[Board] = None
         self._controller: Optional[ButtonController] = None
         self._window.title("Tile Matching Game")
-        self.canvas = tk.Canvas(self._window, width=500, height=500, bg="black")
+        self.canvas = tk.Canvas(self._window, width=500, height=500, bg=TK_COLOR_MAP[Color.BLACK])
         self.canvas.pack()
         
         # For automatic block dropping
@@ -37,19 +38,7 @@ class Game:
                 # If you want to know why this looks weird, look up "lambda late binding"
                 controller.on_button(button=button,
                                      fn=lambda event, rs=ruleset: rs.input_rule.handle_input(board, event=event))
-    
-    def set_gravity_rule(self, drop_interval=5000):
-        """
-        Set up the gravity rule that controls automatic block dropping.
-        
-        Args:
-            drop_interval: Time in milliseconds between automatic drops (default: 1000ms = 1 second)
-        """
-        gravity_rule = DownwardGravityRule()
-        gravity_rule.set_update_rate(time_ms=drop_interval)
-        self._board.set_gravity_rule(gravity_rule)
 
-    # TODO: Board might have a live tile. If it does, then it should be drawn after drawing all the static elements
     def render_board(self):
         # Set fixed board display size (in pixels)
         total_board_width = 500
@@ -81,9 +70,6 @@ class Game:
                 tile_element = self._board.get_tile_at(Coordinate(x,y))
                 if tile_element and tile_element.has_elements():
                     elements = tile_element.get_elements()
-                    # Only print the first time to avoid console spam
-                    if x == 0 and y == 0:
-                        print(f"Rendering board with elements...")
                     # Use each element's draw method instead of drawing directly
                     for element in elements:
                         element.draw(self.canvas, x1, y1, x2, y2)
