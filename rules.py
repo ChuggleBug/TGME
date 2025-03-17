@@ -12,8 +12,10 @@ if TYPE_CHECKING:
     from shift_rules import ShiftDirection
 
 
+class GameOverException(BaseException):
+    pass
 
-class ElementGenerationFailException(BaseException):
+class ElementGenerationFailException(GameOverException):
     """
     Exception to be raised in the event when a tile is supposed to
     be generated, but fails to fit inside the board. This typically

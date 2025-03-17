@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from constants import Color
 from structures import Matrix
-from rules import UserInputRuleSet, GravityRule, MatchEventRule
+from rules import UserInputRuleSet, GravityRule, MatchEventRule, GameOverException
 from board_elements import Coordinate
 from constants import TK_COLOR_MAP
 
@@ -146,6 +146,7 @@ class Board:
         self._match_events: List[MatchEventRule] = []
         self._gravity_rule: Optional[GravityRule] = None
         self._cursor: Optional[Cursor] = None
+        self._is_game_over: bool = False
 
     def get_live_tiles(self) -> Optional[BoardElementSet]:
         return self._live_tiles
@@ -223,10 +224,14 @@ class Board:
         """
         update the game after a single tick has passed
         """
-        self._try_apply_match_rule()
-        self._try_apply_generate_rule()
-        self._try_apply_move_rules()
-        self._try_apply_gravity_rule(time_ms)
+        if not self._is_game_over:
+            try:
+                self._try_apply_match_rule()
+                self._try_apply_generate_rule()
+                self._try_apply_move_rules()
+                self._try_apply_gravity_rule(time_ms)
+            except GameOverException:
+                self._is_game_over = True
 
     def _try_apply_match_rule(self):
         if self._match_rule is None:
