@@ -92,7 +92,7 @@ class Game:
                 y1 = y * cell_height
                 y2 = y1 + cell_height
 
-                canvas.create_rectangle(x1, y1, x2, y2, outline=TK_COLOR_MAP[Color.WHITE], width=3)
+                canvas.create_rectangle(x1, y1, x2, y2, outline=TK_COLOR_MAP[Color.WHITE], width=0)
 
                 tile_element = board.get_tile_at(Coordinate(x,y))
                 if tile_element and tile_element.has_elements():
