@@ -1,9 +1,19 @@
 
 from __future__ import annotations
-from enum import Enum, auto
+from enum import Enum
 from typing import Any, Optional, Callable, Dict
 from abc import ABC, abstractmethod
 import tkinter as tk
+
+DEFAULT_KEYBOARD_KEYBINDS = {
+    'UP' : 'Up',
+    'DOWN' : 'Down',
+    'LEFT' : 'Left',
+    'RIGHT' : 'Right',
+    'PRIMARY' : 'space',
+    'SECONDARY' : 'Return'
+}
+
 
 class DirectionButton(Enum):
     UP = 'UP'
@@ -29,7 +39,6 @@ class ActionButton(Enum):
 
     def __str__(self):
         return self.value
-
 
 class ButtonController(ABC):
     def __init__(self):
@@ -59,13 +68,6 @@ class KeyboardController(ButtonController):
     """
     Default keymaps for tkinter
     """
-    UP_KEY = "Up"
-    DOWN_KEY = "Down"
-    LEFT_KEY = "Left"
-    RIGHT_KEY = "Right"
-    PRIMARY_KEY = "space"
-    SECONDARY_KEY = "Return"
-
     def __init__(self):
         super().__init__()
         self._window: Optional[tk.Tk] = None

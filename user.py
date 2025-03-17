@@ -9,7 +9,7 @@ import json
 import copy
 
 import button_controller
-from button_controller import DirectionButton, ActionButton
+from button_controller import DirectionButton, ActionButton, DEFAULT_KEYBOARD_KEYBINDS
 
 if TYPE_CHECKING:
     from typing import Any
@@ -54,6 +54,7 @@ class User:
         user._keyboard_keybinds = {}
         user_dict = user._as_dict()
         user_dict['password'] = _generate_hash(password)
+        user_dict['keyboard keybinds'] = copy.deepcopy(DEFAULT_KEYBOARD_KEYBINDS)
         with open(_get_user_file(username), mode='w+', encoding='utf-8') as fp:
             json.dump(user_dict, fp)
         return user
