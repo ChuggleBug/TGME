@@ -1,6 +1,10 @@
 from typing import TYPE_CHECKING
 import math
 
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from generator_rules import FillAllSpotsRule, FillEmptyTopRowSpotsRule
 from input_rules import CursorApplyDirectionRule, CursorApplySelectionRule
 from match_rules import MatchNOfColorRule
