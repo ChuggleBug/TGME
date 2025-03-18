@@ -23,7 +23,7 @@ class BoardWindow:
 
 class Game:
     TOTAL_BOARD_WIDTH = 500
-    TOTAL_BOARD_HEIGHT = 600
+    TOTAL_BOARD_HEIGHT = 500
 
     def __init__(self):
         self._window = tk.Tk()
