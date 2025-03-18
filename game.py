@@ -65,7 +65,7 @@ class Game:
         score_label = tk.Label(frame, text=f"Score: 0", font=("Arial", 16, "bold"), bg="black", fg="white")
         score_label.pack(pady=5) 
 
-        canvas = tk.Canvas(frame, width=500, height=500, bg=TK_COLOR_MAP[Color.BLACK])
+        canvas = tk.Canvas(frame, width=Game.TOTAL_BOARD_WIDTH, height=Game.TOTAL_BOARD_HEIGHT, bg=TK_COLOR_MAP[Color.BLACK])
         board.set_game(self)  
         board_window = BoardWindow(board=board, canvas=canvas)
 
@@ -179,7 +179,6 @@ class Game:
         
         # Start the update loop
         self.update()
-        time.sleep(1)
 
         # Start the main event loop
         self._window.mainloop()
