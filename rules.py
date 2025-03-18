@@ -171,9 +171,11 @@ class TileMovementRule(ABC):
         ...
 
 class GravityRule(ABC):
+    def __init__(self):
+        self.drop_interval = 1000
 
     def set_update_rate(self, *, time_ms: int):
-        self._update_rate = time_ms
+        self.drop_interval = time_ms
 
     @abstractmethod
     def update(self, board: Board, current_time_ms: int):

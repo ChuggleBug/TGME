@@ -125,18 +125,18 @@ def apply_tetris_rule(board: Board):
 
     # Tile Gravity Rule
     gravity_rule = DownwardGravityRule()
-    gravity_rule.set_update_rate(time_ms=2500)
+    gravity_rule.set_update_rate(time_ms=50)
     board.set_gravity_rule(gravity_rule)
 
 
 if __name__ == '__main__':
     game = Game()
 
-    board1 = Board(height=30, width=10)
+    board1 = Board(height=40, width=10)
     apply_tetris_rule(board1)
     game.add_board(board1)
 
-    board2 = Board(height=30, width=10)
+    board2 = Board(height=40, width=10)
     apply_tetris_rule(board2)
     game.add_board(board2)
 
@@ -147,15 +147,11 @@ if __name__ == '__main__':
     controller1.set_keybinds(user1.get_keyboard_keybinds())
     # tkinter specific
     controller1.bind_to_board_window(game.get_window())
-    controller1.setup_controller()
 
     controller2 = KeyboardController()
     controller2.set_keybinds(user2.get_keyboard_keybinds())
     # tkinter specific
     controller2.bind_to_board_window(game.get_window())
-    controller2.setup_controller()
-
-    # Game visual setup
 
     game.bind(controller1, board_index=0)
     game.bind(controller2, board_index=1)

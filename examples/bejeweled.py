@@ -149,13 +149,11 @@ if __name__ == '__main__':
     controller1.set_keybinds(user1.get_keyboard_keybinds())
     # tkinter specific
     controller1.bind_to_board_window(game.get_window())
-    controller1.setup_controller()
 
     controller2 = KeyboardController()
     controller2.set_keybinds(user2.get_keyboard_keybinds())
     # tkinter specific
     controller2.bind_to_board_window(game.get_window())
-    controller2.setup_controller()
 
     game.bind(controller1, board_index=0)
     game.bind(controller2, board_index=1)
