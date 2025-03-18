@@ -227,7 +227,7 @@ class GameSetupApp:
             self.height_q2.pack()
             self.height_entry2.pack()
             self.width_q2.pack()
-            self.width_entry2.pack()a
+            self.width_entry2.pack()
 
             self.username2_label.pack()
             self.username2_entry.pack()
