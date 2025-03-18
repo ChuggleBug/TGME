@@ -19,6 +19,9 @@ class GameSetupApp:
         self.root = root
         self.root.title("Game Setup")
 
+        self.logged_in_users = {}
+
+
         tk.Label(root, text="Select Game:").pack()
         self.game_var = tk.StringVar(value="Tetris")
         tk.Radiobutton(root, text="Tetris", variable=self.game_var, value="Tetris").pack()
@@ -29,12 +32,15 @@ class GameSetupApp:
         tk.Radiobutton(root, text="1 Player", variable=self.player_var, value=1, command=self.toggle_player2_fields).pack()
         tk.Radiobutton(root, text="2 Players", variable=self.player_var, value=2, command=self.toggle_player2_fields).pack()
 
-        tk.Label(root, text="Enter Board Height:").pack()
+        #1
+        self.height_q = tk.Label(root, text="Enter Board Height:")
+        self.height_q.pack()
         self.height_entry = tk.Entry(root)
         self.height_entry.pack()
 
 
-        tk.Label(root, text="Enter Board Width:").pack()
+        self.width_q = tk.Label(root, text="Enter Board Width:")
+        self.width_q.pack()
         self.width_entry = tk.Entry(root)
         self.width_entry.pack()
 
@@ -56,7 +62,15 @@ class GameSetupApp:
         self.create_user1_button.pack()
 
 
+        #2
         self.player2_frame = tk.Frame(root) 
+
+        self.height_q2 = tk.Label(self.player2_frame, text="Enter Board_2 Height:")
+        self.height_entry2 = tk.Entry(self.player2_frame)
+
+        self.width_q2 = tk.Label(self.player2_frame, text="Enter Board_2 Width:")
+        self.width_entry2 = tk.Entry(self.player2_frame)
+
 
         self.username2_label = tk.Label(self.player2_frame, text="Player 2 Username:")
         self.username2_entry = tk.Entry(self.player2_frame)
@@ -82,13 +96,16 @@ class GameSetupApp:
     def toggle_player2_fields(self):
         if self.player_var.get() == 2:
             self.player2_frame.pack()  
+            self.height_q2.pack()
+            self.height_entry2.pack()
+            self.width_q2.pack() 
+            self.width_entry2.pack()
             self.username2_label.pack()
             self.username2_entry.pack()
             self.password2_label.pack()
             self.password2_entry.pack()
             self.login_user2_button.pack()  
             self.create_user2_button.pack()
-
         else:
             self.player2_frame.pack_forget()  
 
@@ -125,8 +142,14 @@ class GameSetupApp:
             messagebox.showerror("Login Error", "Username and password cannot be empty.")
             return
 
+        if username in self.logged_in_users:
+            messagebox.showerror("Login Error", f"User '{username}' is already logged in!")
+            return None
         try:
             user = User.load_from_file(username, password=password)
+
+            self.logged_in_users[username] = user
+
 
             if player_num == 1:
                 self.username1_label.pack_forget()
@@ -135,7 +158,10 @@ class GameSetupApp:
                 self.password1_entry.pack_forget()
                 self.login_user1_button.pack_forget()
                 self.create_user1_button.pack_forget()
-
+                self.height_entry.pack_forget()
+                self.width_entry.pack_forget()
+                self.height_q.pack_forget()
+                self.width_q.pack_forget()
                 self.player1_status = tk.Label(self.root, text=f"Logged in as {username}", fg="green", font=("Arial", 12, "bold"))
                 self.player1_status.pack()
 
@@ -149,7 +175,10 @@ class GameSetupApp:
                 self.password2_entry.pack_forget()
                 self.login_user2_button.pack_forget()
                 self.create_user2_button.pack_forget()
-
+                self.height_q2.pack_forget()
+                self.height_entry2.pack_forget()
+                self.width_q2.pack_forget()
+                self.width_entry2.pack_forget()
                 self.player2_status = tk.Label(self.player2_frame, text=f"Logged in as {username}", fg="green", font=("Arial", 12, "bold"))
                 self.player2_status.pack()
 
@@ -167,8 +196,10 @@ class GameSetupApp:
 
     def logout_user(self, player_num):
         if player_num == 1:
+            username = self.player1_status.cget("text").replace("Logged in as ", "")
             self.player1_status.pack_forget()
             self.logout_user1_button.pack_forget()
+            self.logged_in_users.pop(username, None)
 
             self.username1_entry.pack()
             self.password1_entry.pack()
@@ -176,8 +207,10 @@ class GameSetupApp:
             self.create_user1_button.pack()
 
         else:
+            username = self.player2_status.cget("text").replace("Logged in as ", "")
             self.player2_status.pack_forget()
             self.logout_user2_button.pack_forget()
+            self.logged_in_users.pop(username, None)
 
             self.username2_entry.pack()
             self.password2_entry.pack()
@@ -192,18 +225,21 @@ class GameSetupApp:
 
         height = self.get_int_input(self.height_entry)
         width = self.get_int_input(self.width_entry)
+        height2 = self.get_int_input(self.height_entry2)
+        width2 = self.get_int_input(self.width_entry2)
+
 
         if height is None or width is None:
             return   
 
 
-        user1 = self.login_user(1)
-        if num_players == 2:
-            user2 = self.login_user(2)
-        else:
-            user2 = None 
+        logged_in_users_list = list(self.logged_in_users.values())
+        user1 = logged_in_users_list[0] if len(logged_in_users_list) > 0 else None
+        user2 = logged_in_users_list[1] if num_players == 2 and len(logged_in_users_list) > 1 else None
+
 
         if not user1 or (num_players == 2 and not user2):
+            messagebox.showerror("Error", "Both players must be logged in before starting the game.")
             return  
 
         game = Game()
@@ -218,7 +254,7 @@ class GameSetupApp:
         game.bind(controller1, board_index=0)
 
         if num_players == 2:
-            board2 = Board(height, width)
+            board2 = Board(height2, width2)
             PREMADE_GAMES[game_name](board2)
             game.add_board(board2)
 
@@ -236,7 +272,7 @@ if __name__ == "__main__":
     root = tk.Tk()
 
     window_width = 300
-    window_height = 600
+    window_height = 700
 
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
