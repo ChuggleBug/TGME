@@ -13,15 +13,14 @@ from button_controller import KeyboardController, DirectionButton, ActionButton
 from board import Board
 from board_elements import  GameElement
 from provider import UniformRandomElementProvider
-from constants import Color
+from constants import Color, darken_color, TK_COLOR_MAP
 from shift_rules import ShiftStaticTilesRule, ShiftDirection
 from user import User
 
 if TYPE_CHECKING:
     pass
 
-# TODO: if anyone wants to, they can make a class for each gem color and
-#  make them look pretty
+
 class Gem(GameElement):
     def __init__(self, *, name: str, color: Color):
         self.element_name = name
@@ -29,7 +28,6 @@ class Gem(GameElement):
 
     def draw(self, canvas, x1: int, y1: int, x2: int, y2: int):
         # Get the corresponding tkinter color
-        from constants import TK_COLOR_MAP
         tile_color = TK_COLOR_MAP.get(self.element_color, "white")
         if self.element_name == 'GemRed':
             #Diamond
@@ -43,10 +41,10 @@ class Gem(GameElement):
                 (center_x, y2 - 5), 
                 (x1 + 5, center_y)
             ]
-            canvas.create_polygon(points, fill=tile_color, outline="white", width=2)
+            canvas.create_polygon(points, fill=tile_color, outline=darken_color(self.element_color, percentage=25), width=2)
         elif self.element_name == 'GemOrange':
             #Circle
-            canvas.create_oval(x1 + 5, y1 + 5, x2 - 5, y2 - 5, fill=tile_color, outline="white", width=2)
+            canvas.create_oval(x1 + 5, y1 + 5, x2 - 5, y2 - 5, fill=tile_color, outline=darken_color(self.element_color, percentage=25), width=2)
         elif self.element_name == 'GemGreen':
             #Triangle
             center_x = (x1 + x2) // 2
@@ -55,7 +53,7 @@ class Gem(GameElement):
                 (x1 + 10, y2 - 10),
                 (x2 - 10, y2 - 10)
             ]
-            canvas.create_polygon(points, fill=tile_color, outline="white", width=2)
+            canvas.create_polygon(points, fill=tile_color, outline=darken_color(self.element_color, percentage=25), width=2)
         elif self.element_name == 'GemBlue':
             #Pentagon
             center_x = (x1 + x2) // 2
@@ -67,7 +65,7 @@ class Gem(GameElement):
                 px = center_x + radius * math.cos(angle)
                 py = center_y - radius * math.sin(angle)
                 points.append((px, py))
-            canvas.create_polygon(points, fill=tile_color, outline="white", width=2)
+            canvas.create_polygon(points, fill=tile_color, outline=darken_color(self.element_color, percentage=25), width=2)
         elif self.element_name == 'GemPurple':
             #Upsidedown Triangle
             center_x = (x1 + x2) // 2
@@ -76,10 +74,22 @@ class Gem(GameElement):
                 (x2 - 10, y1 + 10),
                 (center_x, y2 - 10)
             ]
-            canvas.create_polygon(points, fill=tile_color, outline="white", width=2)
+            canvas.create_polygon(points, fill=tile_color, outline=darken_color(self.element_color, percentage=25), width=2)
+        elif self.element_name == 'GemWhite':
+            # Octagon
+            center_x = (x1 + x2) // 2
+            center_y = (y1 + y2) // 2
+            radius = min((x2 - x1), (y2 - y1)) // 2.5
+            points = []
+            for i in range(6):
+                angle = math.radians(90 + i * 60)
+                px = center_x + radius * math.cos(angle)
+                py = center_y - radius * math.sin(angle)
+                points.append((px, py))
+            canvas.create_polygon(points, fill=tile_color, outline=darken_color(self.element_color, percentage=25), width=2)
         else:
             #Square
-            canvas.create_rectangle(x1 + 10, y1 + 10, x2 - 10, y2 - 10, fill=tile_color, outline="white", width=3)
+            canvas.create_rectangle(x1 + 10, y1 + 10, x2 - 10, y2 - 10, fill=tile_color, outline=darken_color(self.element_color, percentage=25), width=3)
 
 # class Blocker(GameElement):
 #     def __init__(self):

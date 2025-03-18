@@ -68,14 +68,14 @@ class Cursor:
 
                 #Secondary X
                 corner_length = 15
-                canvas.create_line(w1, u1, w1 + corner_length, u1, fill="gray60", width=3)
-                canvas.create_line(w1, u1, w1, u1 + corner_length, fill="gray60", width=3)
-                canvas.create_line(w2, u1, w2 - corner_length, u1, fill="gray60", width=3)
-                canvas.create_line(w2, u1, w2, u1 + corner_length, fill="gray60", width=3)
-                canvas.create_line(w1, u2, w1 + corner_length, u2, fill="gray60", width=3)
-                canvas.create_line(w1, u2, w1, u2 - corner_length, fill="gray60", width=3)
-                canvas.create_line(w2, u2, w2 - corner_length, u2, fill="gray60", width=3)
-                canvas.create_line(w2, u2, w2, u2 - corner_length, fill="gray60", width=3)
+                canvas.create_line(w1, u1, w1 + corner_length, u1, fill=TK_COLOR_MAP[Color.GRAY], width=3)
+                canvas.create_line(w1, u1, w1, u1 + corner_length, fill=TK_COLOR_MAP[Color.GRAY], width=3)
+                canvas.create_line(w2, u1, w2 - corner_length, u1, fill=TK_COLOR_MAP[Color.GRAY], width=3)
+                canvas.create_line(w2, u1, w2, u1 + corner_length, fill=TK_COLOR_MAP[Color.GRAY], width=3)
+                canvas.create_line(w1, u2, w1 + corner_length, u2, fill=TK_COLOR_MAP[Color.GRAY], width=3)
+                canvas.create_line(w1, u2, w1, u2 - corner_length, fill=TK_COLOR_MAP[Color.GRAY], width=3)
+                canvas.create_line(w2, u2, w2 - corner_length, u2, fill=TK_COLOR_MAP[Color.GRAY], width=3)
+                canvas.create_line(w2, u2, w2, u2 - corner_length, fill=TK_COLOR_MAP[Color.GRAY], width=3)
 
 
 
@@ -147,6 +147,9 @@ class Board:
         self._gravity_rule: Optional[GravityRule] = None
         self._cursor: Optional[Cursor] = None
         self._is_game_over: bool = False
+
+    def is_game_over(self) -> bool:
+       return self._is_game_over
 
     def get_live_tiles(self) -> Optional[BoardElementSet]:
         return self._live_tiles
