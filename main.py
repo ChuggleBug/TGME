@@ -126,12 +126,12 @@ class GameSetupApp:
     def get_int_input(self, entry):
         try:
             value = int(entry.get().strip())
-            if value >= 10:
-                return value
-            else:
-                raise ValueError
+            if value < 10: 
+                messagebox.showerror("Input Error", "Please enter a number greater than or equal to 10")
+                return None
+            return value  
         except ValueError:
-            messagebox.showerror("Input Error", "Please enter a number more than or equal to 10")
+            messagebox.showerror("Input Error", "Invalid input! Please enter a valid number.")
             return None
 
     def login_user(self, player_num):
@@ -201,8 +201,20 @@ class GameSetupApp:
             self.logout_user1_button.pack_forget()
             self.logged_in_users.pop(username, None)
 
+            self.height_q.pack()
+            self.height_entry.pack()
+
+            self.width_q.pack()
+            self.width_entry.pack()
+
+            self.player1_status.pack_forget()
+
+            self.username1_label.pack()
             self.username1_entry.pack()
+
+            self.password1_label.pack()
             self.password1_entry.pack()
+
             self.login_user1_button.pack()
             self.create_user1_button.pack()
 
@@ -212,8 +224,17 @@ class GameSetupApp:
             self.logout_user2_button.pack_forget()
             self.logged_in_users.pop(username, None)
 
+            self.height_q2.pack()
+            self.height_entry2.pack()
+            self.width_q2.pack()
+            self.width_entry2.pack()a
+
+            self.username2_label.pack()
             self.username2_entry.pack()
+
+            self.password2_label.pack()
             self.password2_entry.pack()
+
             self.login_user2_button.pack()
             self.create_user2_button.pack()
 
@@ -225,13 +246,12 @@ class GameSetupApp:
 
         height = self.get_int_input(self.height_entry)
         width = self.get_int_input(self.width_entry)
-        height2 = self.get_int_input(self.height_entry2)
-        width2 = self.get_int_input(self.width_entry2)
+        height2 = self.get_int_input(self.height_entry2) if num_players == 2 else None
+        width2 = self.get_int_input(self.width_entry2) if num_players == 2 else None
 
 
-        if height is None or width is None:
-            return   
-
+        if height is None or width is None or (num_players == 2 and (height2 is None or width2 is None)):
+            return 
 
         logged_in_users_list = list(self.logged_in_users.values())
         user1 = logged_in_users_list[0] if len(logged_in_users_list) > 0 else None
@@ -264,7 +284,6 @@ class GameSetupApp:
 
             game.bind(controller2, board_index=1)
 
-        messagebox.showinfo("Game Starting", f"Starting {game_name} with {num_players} player(s)...")
         self.root.destroy()
         game.start()
 
