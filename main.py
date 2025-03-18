@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from typing import Callable
 
-from button_controller import KeyboardController
+from button_controller import ActionButton, DirectionButton, KeyboardController
 from examples.tetris import apply_tetris_rule
 from examples.bejeweled import apply_bejeweled_rule
 from board import Board
@@ -26,12 +26,16 @@ class GameSetupApp:
         self.game_var = tk.StringVar(value="Tetris")
         tk.Radiobutton(root, text="Tetris", variable=self.game_var, value="Tetris").pack()
         tk.Radiobutton(root, text="Bejeweled", variable=self.game_var, value="Bejeweled").pack()
+        self.configure_controls1_button = tk.Button(root, text="Configure Controls (P1)", command=lambda: self.configure_controls(1))
+        self.configure_controls1_button.pack()
 
         self.player2_game_frame = tk.Frame(root)
         tk.Label(self.player2_game_frame, text="Player 2: Select Game:").pack()
         self.game_var2 = tk.StringVar(value="Tetris")
         tk.Radiobutton(self.player2_game_frame, text="Tetris", variable=self.game_var2, value="Tetris").pack()
         tk.Radiobutton(self.player2_game_frame, text="Bejeweled", variable=self.game_var2, value="Bejeweled").pack()
+        self.configure_controls2_button = tk.Button(self.player2_game_frame, text="Configure Controls (P2)", command=lambda: self.configure_controls(2))
+
 
         tk.Label(root, text="Select Number of Players:").pack()
         self.player_var = tk.IntVar(value=1)
@@ -113,9 +117,11 @@ class GameSetupApp:
             self.login_user2_button.pack()  
             self.create_user2_button.pack()
             self.player2_game_frame.pack()
+            self.configure_controls2_button.pack()
         else:
             self.player2_frame.pack_forget()  
             self.player2_game_frame.pack_forget()
+
 
 
     def create_user(self, player_num):
@@ -247,6 +253,56 @@ class GameSetupApp:
             self.login_user2_button.pack()
             self.create_user2_button.pack()
 
+    def configure_controls(self, player_num):
+        config_window = tk.Toplevel(self.root)
+        config_window.title(f"Configure Controls - Player {player_num}")
+
+        if player_num == 1:  
+            current_user = self.logged_in_users.get(self.username1_entry.get().strip()) 
+        else:
+            current_user = self.logged_in_users.get(self.username2_entry.get().strip())
+
+        if not current_user:
+            messagebox.showerror("Error", "User must be logged in to configure controls.")
+            config_window.destroy()
+            return
+
+        control_vars = {str(button): tk.StringVar(value=current_user.get_keyboard_keybinds().get(str(button), "Press a key"))
+                        for button in (DirectionButton.LEFT, DirectionButton.RIGHT, DirectionButton.UP, DirectionButton.DOWN, 
+                                    ActionButton.PRIMARY, ActionButton.SECONDARY)}
+
+        def set_key(button):
+            def on_key_press(event):
+                control_vars[str(button)].set(event.keysym)
+                key_buttons[button].config(text=f"{button}: {event.keysym}")
+                config_window.unbind("<Key>")
+
+            config_window.bind("<Key>", on_key_press)
+
+        key_buttons = {}
+
+        for i, button in enumerate(control_vars.keys()):
+            tk.Label(config_window, text=button).grid(row=i, column=0, padx=10, pady=5)
+            key_buttons[button] = tk.Button(config_window, text=control_vars[button].get(), 
+                                            command=lambda b=button: set_key(b))
+            key_buttons[button].grid(row=i, column=1, padx=10, pady=5)
+
+        def save_controls():
+            for button, var in control_vars.items():
+                if button in [str(b) for b in DirectionButton.as_set()]:
+                    current_user.set_keyboard_keybind(DirectionButton[button], var.get())
+                elif button in [str(b) for b in ActionButton.as_set()]:
+                    current_user.set_keyboard_keybind(ActionButton[button], var.get())
+
+            current_user.save_user(password=self.password1_entry.get().strip() if player_num == 1 else 
+                                                self.password2_entry.get().strip())
+
+            messagebox.showinfo("Success", f"Controls saved for {current_user._username}!")
+            config_window.destroy()
+
+        save_button = tk.Button(config_window, text="Save Controls", command=save_controls)
+        save_button.grid(row=len(control_vars), column=0, columnspan=2, pady=10)
+
 
     def start_game(self):
         num_players = self.player_var.get()
@@ -280,7 +336,6 @@ class GameSetupApp:
         controller1 = KeyboardController()
         controller1.set_keybinds(user1.get_keyboard_keybinds())
         controller1.bind_to_board_window(game.get_window())
-
         game.bind(controller1, board_index=0)
 
         if num_players == 2:
@@ -301,7 +356,7 @@ if __name__ == "__main__":
     root = tk.Tk()
 
     window_width = 600
-    window_height = 750
+    window_height = 800
 
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
@@ -313,3 +368,5 @@ if __name__ == "__main__":
 
     app = GameSetupApp(root)
     root.mainloop()
+
+
