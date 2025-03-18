@@ -22,10 +22,16 @@ class GameSetupApp:
         self.logged_in_users = {}
 
 
-        tk.Label(root, text="Select Game:").pack()
+        tk.Label(root, text="Player 1: Select Game:").pack()
         self.game_var = tk.StringVar(value="Tetris")
         tk.Radiobutton(root, text="Tetris", variable=self.game_var, value="Tetris").pack()
         tk.Radiobutton(root, text="Bejeweled", variable=self.game_var, value="Bejeweled").pack()
+
+        self.player2_game_frame = tk.Frame(root)
+        tk.Label(self.player2_game_frame, text="Player 2: Select Game:").pack()
+        self.game_var2 = tk.StringVar(value="Tetris")
+        tk.Radiobutton(self.player2_game_frame, text="Tetris", variable=self.game_var2, value="Tetris").pack()
+        tk.Radiobutton(self.player2_game_frame, text="Bejeweled", variable=self.game_var2, value="Bejeweled").pack()
 
         tk.Label(root, text="Select Number of Players:").pack()
         self.player_var = tk.IntVar(value=1)
@@ -106,8 +112,11 @@ class GameSetupApp:
             self.password2_entry.pack()
             self.login_user2_button.pack()  
             self.create_user2_button.pack()
+            self.player2_game_frame.pack()
         else:
             self.player2_frame.pack_forget()  
+            self.player2_game_frame.pack_forget()
+
 
     def create_user(self, player_num):
         username = self.username1_entry.get().strip() if player_num == 1 else self.username2_entry.get().strip()
@@ -239,10 +248,11 @@ class GameSetupApp:
             self.create_user2_button.pack()
 
 
-
     def start_game(self):
-        game_name = self.game_var.get()
         num_players = self.player_var.get()
+
+        game_name1 = self.game_var.get()
+        game_name2 = self.game_var2.get() if num_players == 2 else game_name1
 
         height = self.get_int_input(self.height_entry)
         width = self.get_int_input(self.width_entry)
@@ -264,7 +274,7 @@ class GameSetupApp:
 
         game = Game()
         board1 = Board(height, width)
-        PREMADE_GAMES[game_name](board1)
+        PREMADE_GAMES[game_name1](board1)
         game.add_board(board1)
 
         controller1 = KeyboardController()
@@ -275,7 +285,7 @@ class GameSetupApp:
 
         if num_players == 2:
             board2 = Board(height2, width2)
-            PREMADE_GAMES[game_name](board2)
+            PREMADE_GAMES[game_name2](board2)
             game.add_board(board2)
 
             controller2 = KeyboardController()
@@ -290,8 +300,8 @@ class GameSetupApp:
 if __name__ == "__main__":
     root = tk.Tk()
 
-    window_width = 300
-    window_height = 700
+    window_width = 600
+    window_height = 750
 
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
