@@ -14,17 +14,21 @@ if TYPE_CHECKING:
     from typing import Optional, List
     from board import Board
 
+_GAME_OVER_TEXT = 'Game Over!'
+
 @dataclass
 class BoardWindow:
     board: Board
     canvas: tk.Canvas
 
-# TODO: Implement support for two players
-# TODO: theoretically, this can be done by having support for two boards, controller
-# TODO: pairs and then updating the tkinter window accordingly
 class Game:
+    TOTAL_BOARD_WIDTH = 500
+    TOTAL_BOARD_HEIGHT = 500
+
     def __init__(self):
         self._window = tk.Tk()
+        self._window.attributes('-topmost', True)
+
         # self._board: Optional[Board] = None
         # self._controller: Optional[ButtonController] = None
         self._window.title("Tile Matching Game")
@@ -67,18 +71,14 @@ class Game:
         board = board_window.board
         canvas = board_window.canvas
 
-        # Set fixed board display size (in pixels)
-        total_board_width = 500
-        total_board_height = 500
-
         # Calculate individual tile dimensions to stretch and fill the fixed board area
         board_height = board.get_height()
         board_width = board.get_width()
 
         # Instead of using min to get square cells, calculate separate dimensions
         # This will stretch tiles to fill the entire board area
-        cell_width = total_board_width / board_width
-        cell_height = total_board_height / board_height
+        cell_width = Game.TOTAL_BOARD_WIDTH / board_width
+        cell_height = Game.TOTAL_BOARD_HEIGHT / board_height
 
         # First, clear the canvas to prevent overlapping elements
         canvas.delete("all")
@@ -120,6 +120,20 @@ class Game:
         if board.has_cursor():
             board.get_cursor().draw(canvas, cell_height, cell_width)
 
+        if board.is_game_over():
+            Game._write_game_over(canvas)
+
+    @staticmethod
+    def _write_game_over(canvas: tk.Canvas):
+        canvas.create_text(
+            Game.TOTAL_BOARD_WIDTH // 2,
+            Game.TOTAL_BOARD_HEIGHT // 2,
+            text=_GAME_OVER_TEXT,
+            anchor='center',
+            fill=TK_COLOR_MAP[Color.RED],
+            font=('Impact', min(Game.TOTAL_BOARD_WIDTH // 7, Game.TOTAL_BOARD_HEIGHT // 7))
+        )
+
     def update(self):
         """Update game state and redraw."""
         # Apply gravity if needed
@@ -140,6 +154,7 @@ class Game:
         
         # Start the update loop
         self.update()
-        
+        time.sleep(1)
+
         # Start the main event loop
         self._window.mainloop()

@@ -16,7 +16,7 @@ from match_rules import MatchARowRule, ShiftToFillRowEventRule
 from generator_rules import DropElementSetRule
 from provider import RandomRepeatingQueueElementProvider
 from gravity_rules import DownwardGravityRule
-from constants import Color
+from constants import Color, darken_color
 from user import User
 
 if TYPE_CHECKING:
@@ -33,14 +33,14 @@ class TetrisTile(GameElement):
         from constants import TK_COLOR_MAP
         tile_color = TK_COLOR_MAP.get(self.element_color, "white")
         # Draw a colored rectangle with black border
-        canvas.create_rectangle(x1, y1, x2, y2, fill=tile_color, outline="black", width=3)
-        # Add a small indicator in the center to distinguish it from candy
-        center_x = (x1 + x2) // 2
-        center_y = (y1 + y2) // 2
-        size = min(x2 - x1, y2 - y1) // 4
-        canvas.create_oval(center_x - size, center_y - size,
-                           center_x + size, center_y + size,
-                           fill="white")
+        canvas.create_rectangle(x1, y1, x2, y2, fill=tile_color, outline=darken_color(self.element_color, percentage=20), width=3)
+        # # Add a small indicator in the center to distinguish it from candy
+        # center_x = (x1 + x2) // 2
+        # center_y = (y1 + y2) // 2
+        # size = min(x2 - x1, y2 - y1) // 4
+        # canvas.create_oval(center_x - size, center_y - size,
+        #                    center_x + size, center_y + size,
+        #                    fill="white")
 
 light_blue_tile = TetrisTile(name="LightBlueTile", color=Color.LIGHT_BLUE)
 yellow_tile = TetrisTile(name="YellowTile", color=Color.YELLOW)
@@ -138,7 +138,7 @@ if __name__ == '__main__':
 
     board2 = Board(height=40, width=10)
     apply_tetris_rule(board2)
-    game.add_board(board2)
+    # game.add_board(board2)
 
     user1 = User.load_from_file('test_user1', password='test_user1')
     user2 = User.load_from_file('test_user2', password='test_user2')
@@ -154,7 +154,7 @@ if __name__ == '__main__':
     controller2.bind_to_board_window(game.get_window())
 
     game.bind(controller1, board_index=0)
-    game.bind(controller2, board_index=1)
+    # game.bind(controller2, board_index=1)
 
 
     game.start()

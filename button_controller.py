@@ -116,27 +116,21 @@ class KeyboardController(ButtonController):
 
     def _handle_button_event(self, event: tk.Event):
         if event.keysym == self._keybinds['UP']:
-            print(f"Keyboard {id(self)}: UP")
             self._direction_fn_map[DirectionButton.UP](DirectionButton.UP)
 
         elif event.keysym == self._keybinds['DOWN']:
-            print(f"Keyboard {id(self)}: DOWN")
             self._direction_fn_map[DirectionButton.DOWN](DirectionButton.DOWN)
 
         elif event.keysym == self._keybinds['LEFT']:
-            print(f"Keyboard {id(self)}: LEFT")
             self._direction_fn_map[DirectionButton.LEFT](DirectionButton.LEFT)
 
         elif event.keysym == self._keybinds['RIGHT']:
-            print(f"Keyboard {id(self)}: RIGHT")
             self._direction_fn_map[DirectionButton.RIGHT](DirectionButton.RIGHT)
 
         elif event.keysym == self._keybinds['PRIMARY']:
-            print(f"Keyboard {id(self)}: PRIMARY")
             self._action_fn_map[ActionButton.PRIMARY](ActionButton.PRIMARY)
 
         elif event.keysym == self._keybinds['SECONDARY']:
-            print(f"Keyboard {id(self)}: SECONDARY")
             self._action_fn_map[ActionButton.SECONDARY](ActionButton.SECONDARY)
 
     def pause_controller(self):

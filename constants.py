@@ -23,6 +23,17 @@ TK_COLOR_MAP = {
     Color.BLUE: '#0000FF',     # Blue
     Color.YELLOW: '#FFFF00',   # Yellow
     Color.PURPLE: '#800080',   # Purple
-    Color.LIGHT_BLUE: '#ADD8E6', # Light Blue
+    Color.LIGHT_BLUE: '#01FFFF', # Light Blue
     Color.ORANGE: '#FFA500'    # Orange
 }
+
+
+def darken_color(color: Color, percentage: int) -> str:
+    hex_color = TK_COLOR_MAP[color].lstrip("#")
+    r, g, b = int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
+    factor = 1 - (percentage / 100)
+    r = max(0, int(r * factor))
+    g = max(0, int(g * factor))
+    b = max(0, int(b * factor))
+    return f"#{r:02X}{g:02X}{b:02X}"
+
