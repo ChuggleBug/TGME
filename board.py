@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from constants import Color
+from game import Game
 from structures import Matrix
 from rules import UserInputRuleSet, GravityRule, MatchEventRule, GameOverException
 from board_elements import Coordinate
@@ -147,6 +148,11 @@ class Board:
         self._gravity_rule: Optional[GravityRule] = None
         self._cursor: Optional[Cursor] = None
         self._is_game_over: bool = False
+        self._game = None 
+    
+    def set_game(self, game: Game):
+        """Set the reference to the Game instance."""
+        self._game = game
 
     def is_game_over(self) -> bool:
        return self._is_game_over
@@ -241,6 +247,8 @@ class Board:
             return
         destroyed_tiles = self._match_rule.remove_matches(self)
         if len(destroyed_tiles) > 0:
+            if self._game:
+                self._game.update_score(self,1)
             for event in self._match_events:
                 event.trigger(self, destroyed_tiles)
 

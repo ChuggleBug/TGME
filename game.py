@@ -39,6 +39,16 @@ class Game:
         self._boards: List[BoardWindow] = []
         self._controllers: List[ButtonController] = []
 
+        self.scores = {}
+        self.score_labels = {}
+
+    def update_score(self, board: Board, points: int):
+        if board not in self.scores:
+            self.scores[board] = 0  
+        self.scores[board] += points
+        self.score_labels[board].config(text=f"Score: {self.scores[board]}")
+
+
     def bind(self, controller: ButtonController, *, board_index: int):
         board = self.get_board(board_index)
         self._controllers.append(controller)
@@ -49,11 +59,26 @@ class Game:
                                      fn=lambda event, rs=ruleset: rs.input_rule.handle_input(board, event=event))
 
     def add_board(self, board: Board):
-        canvas = tk.Canvas(self._window, width=500, height=500, bg=TK_COLOR_MAP[Color.BLACK])
-        self._boards.append(BoardWindow(board, canvas))
-        canvas.pack(side=tk.LEFT, padx=10)
+        frame = tk.Frame(self._window, bg="black")
+        frame.grid(row=0, column=len(self._boards), padx=20, pady=10)  
+
+        score_label = tk.Label(frame, text=f"Score: 0", font=("Arial", 16, "bold"), bg="black", fg="white")
+        score_label.pack(pady=5) 
+
+        canvas = tk.Canvas(frame, width=500, height=500, bg=TK_COLOR_MAP[Color.BLACK])
+        board.set_game(self)  
+        board_window = BoardWindow(board=board, canvas=canvas)
+
+        self._boards.append(board_window)
+        
+        canvas.pack()
+
+        self.score_labels[board] = score_label
+        self.scores[board] = 0
+
         self._window.update()
 
+        
     def get_board(self, index: int, /) -> Board:
         if index not in range(len(self._boards)):
             raise IndexError
