@@ -123,6 +123,37 @@ class GameSetupApp:
             self.player2_game_frame.pack_forget()
 
 
+    def show_instructions(self, game_name, on_continue):
+        instructions_window = tk.Toplevel(self.root)
+        instructions_window.title(f"{game_name} Instructions")
+        instructions_window.geometry("400x300")
+
+        instructions_text = {
+            "Tetris": "TETRIS INSTRUCTIONS\n\n"
+                    "Objective:\n- Arrange falling blocks to form full rows.\n"
+                    "- Each cleared row gives 1 point.\n\n"
+                    "Controls:\n- Move Left: Shift block left.\n"
+                    "- Move Right: Shift block right.\n"
+                    "- Rotate: Rotate the block.\n"
+                    "- Drop: Quickly place the block.\n\n"
+                    "Game Over:\n- The game ends when blocks reach the top.",
+            
+            "Bejeweled": "BEJEWELED INSTRUCTIONS\n\n"
+                        "Objective:\n- Swap adjacent gems to match 3 or more of the same color.\n"
+                        "- Matches disappear, and new gems fall.\n\n"
+                        "Controls:\n- Move Cursor: Navigate to a gem.\n"
+                        "- Swap Gems: Select two adjacent gems to swap them.\n\n"
+                        "Scoring:\n- Match 3: 1 point per cleared match.\n"
+                        "- Chain Reactions give bonus points.\n\n"
+                        "Game Over:\n- No more valid moves."
+        }
+
+        label = tk.Label(instructions_window, text=instructions_text[game_name], justify="left", padx=10, pady=10)
+        label.pack()
+
+        continue_button = tk.Button(instructions_window, text="Continue", command=lambda: [instructions_window.destroy(), on_continue()])
+        continue_button.pack(pady=10)
+
 
     def create_user(self, player_num):
         username = self.username1_entry.get().strip() if player_num == 1 else self.username2_entry.get().strip()
@@ -328,29 +359,33 @@ class GameSetupApp:
             messagebox.showerror("Error", "Both players must be logged in before starting the game.")
             return  
 
-        game = Game()
-        board1 = Board(height, width)
-        PREMADE_GAMES[game_name1](board1)
-        game.add_board(board1)
+        def start_after_instructions():
+            game = Game()
+            board1 = Board(height, width)
+            PREMADE_GAMES[game_name1](board1)
+            game.add_board(board1)
 
-        controller1 = KeyboardController()
-        controller1.set_keybinds(user1.get_keyboard_keybinds())
-        controller1.bind_to_board_window(game.get_window())
-        game.bind(controller1, board_index=0)
+            controller1 = KeyboardController()
+            controller1.set_keybinds(user1.get_keyboard_keybinds())
+            controller1.bind_to_board_window(game.get_window())
+            game.bind(controller1, board_index=0)
 
-        if num_players == 2:
-            board2 = Board(height2, width2)
-            PREMADE_GAMES[game_name2](board2)
-            game.add_board(board2)
+            if num_players == 2:
+                board2 = Board(height2, width2)
+                PREMADE_GAMES[game_name2](board2)
+                game.add_board(board2)
 
-            controller2 = KeyboardController()
-            controller2.set_keybinds(user2.get_keyboard_keybinds())
-            controller2.bind_to_board_window(game.get_window())
+                controller2 = KeyboardController()
+                controller2.set_keybinds(user2.get_keyboard_keybinds())
+                controller2.bind_to_board_window(game.get_window())
 
-            game.bind(controller2, board_index=1)
+                game.bind(controller2, board_index=1)
 
-        self.root.destroy()
-        game.start()
+            self.root.destroy()
+            game.start()
+        
+        self.show_instructions(game_name1, start_after_instructions)
+
 
 if __name__ == "__main__":
     root = tk.Tk()
