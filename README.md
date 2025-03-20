@@ -40,7 +40,9 @@ follows (assuming they were not modified):
 ## Additional Notes
 The GUI was developed with Windows in mind. Because of the way that 
 tkiner works, there might be some slight visual issues when using operating
-systems. The core functionality is not affected, however. 
+systems. **This means that in some cases, windows might need to be 
+stretched to see the entire window.** The core functionality is 
+not affected, however. 
 
 ## Python Information
 Most of the development was done under python3.12. Older versions of
