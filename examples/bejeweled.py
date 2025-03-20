@@ -3,6 +3,9 @@ import math
 
 import sys
 import os
+
+from condition_rules import CheckIfMatchPossibleRule
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from generator_rules import FillAllSpotsRule, FillEmptyTopRowSpotsRule
@@ -144,6 +147,7 @@ def apply_bejeweled_rule(board: Board):
     match_rule.set_match_length(3)
     board.set_tile_match_rule(match_rule)
 
+    board.add_game_condition_rule(CheckIfMatchPossibleRule())
 
 if __name__ == '__main__':
     game = Game()

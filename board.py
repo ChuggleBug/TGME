@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from button_controller import DirectionButton, ActionButton
     from board_elements import GameElement, ElementSet, BoardElementSet
     from shift_rules import ShiftDirection
-    from rules import TileMatchRule, TileGeneratorRule, TileMovementRule, UserInputRule
+    from rules import TileMatchRule, TileGeneratorRule, TileMovementRule, UserInputRule, GameConditionRule
 
 
 class Cursor:
@@ -146,6 +146,7 @@ class Board:
         self._static_move_rule: Optional[TileMovementRule] = None
         self._match_events: List[MatchEventRule] = []
         self._gravity_rule: Optional[GravityRule] = None
+        self._game_condition: List[GameConditionRule] = []
         self._cursor: Optional[Cursor] = None
         self._is_game_over: bool = False
         self._game = None 
@@ -199,6 +200,9 @@ class Board:
     def add_match_event_rule(self, match_event: MatchEventRule):
         self._match_events.append(match_event)
 
+    def add_game_condition_rule(self, game_condition: GameConditionRule):
+        self._game_condition.append(game_condition)
+
     def get_user_input_rules(self) -> Iterable[UserInputRuleSet]:
         return self._input_rules
 
@@ -239,8 +243,10 @@ class Board:
                 self._try_apply_generate_rule()
                 self._try_apply_move_rules()
                 self._try_apply_gravity_rule(time_ms)
+                self._try_apply_game_condition_rule()
             except GameOverException:
                 self._is_game_over = True
+                self._cursor = None
 
     def _try_apply_match_rule(self):
         if self._match_rule is None:
@@ -265,3 +271,7 @@ class Board:
     def _try_apply_gravity_rule(self, time_ms: int):
         if self._gravity_rule is not None:
             self._gravity_rule.update(self, current_time=time_ms)
+
+    def _try_apply_game_condition_rule(self):
+        for condition in self._game_condition:
+            condition.check_game_condition(self)

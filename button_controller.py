@@ -100,7 +100,6 @@ class KeyboardController(ButtonController):
     """
     def __init__(self):
         super().__init__()
-        self._window: Optional[tk.Tk] = None
         self._keybinds_set: bool = False
         _KeyboardControllerManager.add_keyboard_input_handler(lambda event: self._handle_button_event(event))
 
@@ -134,7 +133,7 @@ class KeyboardController(ButtonController):
             self._action_fn_map[ActionButton.SECONDARY](ActionButton.SECONDARY)
 
     def pause_controller(self):
-        self._window.unbind("<KeyPress>")
+        pass
 
     def start_controller(self):
         if not self._keybinds_set:
