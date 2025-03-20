@@ -123,32 +123,33 @@ class GameSetupApp:
             self.player2_game_frame.pack_forget()
 
 
-    def show_instructions(self, game_name, on_continue):
+    def show_instructions(self, game_name,user1, user2, on_continue):
         instructions_window = tk.Toplevel(self.root)
         instructions_window.title(f"{game_name} Instructions")
-        instructions_window.geometry("400x300")
+        instructions_window.geometry("500x450")
 
         instructions_text = {
             "Tetris": "TETRIS INSTRUCTIONS\n\n"
                     "Objective:\n- Arrange falling blocks to form full rows.\n"
                     "- Each cleared row gives 1 point.\n\n"
-                    "Controls:\n- Move Left: Shift block left.\n"
-                    "- Move Right: Shift block right.\n"
-                    "- Rotate: Rotate the block.\n"
-                    "- Drop: Quickly place the block.\n\n"
-                    "Game Over:\n- The game ends when blocks reach the top.",
+                    "Game Over:\n- The game ends when blocks reach the top.\n\n",
             
             "Bejeweled": "BEJEWELED INSTRUCTIONS\n\n"
                         "Objective:\n- Swap adjacent gems to match 3 or more of the same color.\n"
-                        "- Matches disappear, and new gems fall.\n\n"
-                        "Controls:\n- Move Cursor: Navigate to a gem.\n"
-                        "- Swap Gems: Select two adjacent gems to swap them.\n\n"
-                        "Scoring:\n- Match 3: 1 point per cleared match.\n"
-                        "- Chain Reactions give bonus points.\n\n"
-                        "Game Over:\n- No more valid moves."
+                        "- Matches disappear, and new gems fall.\n"
+                        "Game Over:\n- No more valid moves.\n"
         }
 
-        label = tk.Label(instructions_window, text=instructions_text[game_name], justify="left", padx=10, pady=10)
+        player1_keybinds = "\n".join([f"{action}: {key}" for action, key in user1.get_keyboard_keybinds().items()])
+        player1_text = f"\nPLAYER 1 CONTROLS:\n{player1_keybinds}\n"
+
+        if user2:
+            player2_keybinds = "\n".join([f"{action}: {key}" for action, key in user2.get_keyboard_keybinds().items()])
+            player2_text = f"\nPLAYER 2 CONTROLS:\n{player2_keybinds}\n"
+        else:
+            player2_text = ""
+
+        label = tk.Label(instructions_window, text=instructions_text[game_name] + player1_text + player2_text, justify="left", padx=10, pady=10)
         label.pack()
 
         continue_button = tk.Button(instructions_window, text="Continue", command=lambda: [instructions_window.destroy(), on_continue()])
@@ -299,7 +300,7 @@ class GameSetupApp:
             return
 
         control_vars = {str(button): tk.StringVar(value=current_user.get_keyboard_keybinds().get(str(button), "Press a key"))
-                        for button in (DirectionButton.LEFT, DirectionButton.RIGHT, DirectionButton.UP, DirectionButton.DOWN, 
+                        for button in (DirectionButton.UP, DirectionButton.DOWN, DirectionButton.LEFT,DirectionButton.RIGHT,
                                     ActionButton.PRIMARY, ActionButton.SECONDARY)}
 
         def set_key(button):
@@ -384,7 +385,7 @@ class GameSetupApp:
             self.root.destroy()
             game.start()
         
-        self.show_instructions(game_name1, start_after_instructions)
+        self.show_instructions(game_name1, user1, user2, start_after_instructions)
 
 
 if __name__ == "__main__":
