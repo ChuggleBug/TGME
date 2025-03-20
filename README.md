@@ -24,6 +24,9 @@ Two default user accounts have been provided credentials are
 - username: `test_user1`, password: `test_user1`
 - username: `test_user2`, password: `test_user2`
 
+The controls for each of the test users are as 
+follows (assuming they were not modified):
+
 | Control    | test_user1 | test_user2      |
 |------------|-----------|----------------|
 | **UP**     | W         | Up Arrow       |
