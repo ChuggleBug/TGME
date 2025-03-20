@@ -25,6 +25,9 @@ class ElementGenerationFailException(GameOverException):
     """
     pass
 
+class NoMoreMatchesPossibleException(GameOverException):
+    pass
+
 
 class MatchEventRule(ABC):
     """
@@ -182,3 +185,11 @@ class GravityRule(ABC):
         ...
 
 
+class GameConditionRule(ABC):
+
+    @abstractmethod
+    def check_game_condition(self, board: Board):
+        """
+        Check the status of the board, and make modifications if necessary
+        """
+        ...

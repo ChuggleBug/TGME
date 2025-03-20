@@ -33,7 +33,7 @@ class GameElement(ABC):
     # A single element can move around and is not locked to the tile
     supports_tile_move: bool = field(default=True)
     # Live tiles can move through this element
-    supports_move_through: bool = field(default=True)
+    supports_move_through: bool = field(default=False)
     # The element "absorbs" a destroy
     do_block_destroy: bool = field(default=False)
 

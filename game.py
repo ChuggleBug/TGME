@@ -11,7 +11,7 @@ from constants import TK_COLOR_MAP
 from constants import Color
 
 if TYPE_CHECKING:
-    from typing import Optional, List
+    from typing import List
     from board import Board
 
 _GAME_OVER_TEXT = 'Game Over!'
@@ -29,12 +29,7 @@ class Game:
         self._window = tk.Tk()
         self._window.attributes('-topmost', True)
 
-        # self._board: Optional[Board] = None
-        # self._controller: Optional[ButtonController] = None
         self._window.title("Tile Matching Game")
-        # self.canvas = tk.Canvas(self._window, width=500, height=500, bg=TK_COLOR_MAP[Color.BLACK])
-        # self.canvas.pack()
-        # For automatic block dropping
         self.update_interval = 100  # 100ms (10 updates per second)
         self._boards: List[BoardWindow] = []
         self._controllers: List[ButtonController] = []
