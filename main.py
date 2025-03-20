@@ -126,7 +126,7 @@ class GameSetupApp:
     def show_instructions(self, game_name,user1, user2, on_continue):
         instructions_window = tk.Toplevel(self.root)
         instructions_window.title(f"{game_name} Instructions")
-        instructions_window.geometry("500x450")
+        instructions_window.geometry("700x550")
 
         instructions_text = {
             "Tetris": "TETRIS INSTRUCTIONS\n\n"
