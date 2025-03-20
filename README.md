@@ -27,3 +27,7 @@ Two default user accounts have been provided credentials are
 The GUI was developed with Windows in mind. Because of the way that 
 tkiner works, there might be some slight visual issues when using operating
 systems. The core functionality is not affected, however. 
+
+## Python Information
+Most of the development was done under python3.12. Older versions of
+python might work, but have not been tested to ensure quality
