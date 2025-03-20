@@ -130,14 +130,32 @@ class GameSetupApp:
 
         instructions_text = {
             "Tetris": "TETRIS INSTRUCTIONS\n\n"
-                    "Objective:\n- Arrange falling blocks to form full rows.\n"
-                    "- Each cleared row gives 1 point.\n\n"
-                    "Game Over:\n- The game ends when blocks reach the top.\n\n",
-            
+                "Objective:\n"
+                "- Arrange falling blocks to form full rows.\n"
+                "- Each cleared row gives 1 point.\n\n"
+                "Game Over:\n"
+                "- The game ends when blocks reach the top.\n\n"
+                "Controls:\n"
+                "- Down Button: Shift block down.\n"
+                "- Left Button: Shift block left.\n"
+                "- Right Button: Shift block right.\n"
+                "- Primary Button: Rotate the block clockwise.\n"
+                "- Secondary Button: Rotate the block counterclockwise.\n",
+
             "Bejeweled": "BEJEWELED INSTRUCTIONS\n\n"
-                        "Objective:\n- Swap adjacent gems to match 3 or more of the same color.\n"
-                        "- Matches disappear, and new gems fall.\n"
-                        "Game Over:\n- No more valid moves.\n"
+                 "Objective:\n"
+                 "- Swap adjacent gems to match 3 or more of the same color.\n"
+                 "- Matches disappear, and new gems fall.\n\n"
+                 "Game Over:\n"
+                 "- No more valid moves.\n\n"
+                 "Controls:\n"
+                 "- Up Button: Move cursor up.\n"
+                 "- Down Button: Move cursor down.\n"
+                 "- Left Button: Move cursor left.\n"
+                 "- Right Button: Move cursor right.\n"
+                 "- Primary Button: Change to swapping state/Swap tiles.\n"
+                 "- Secondary Button: Change to movement state.\n",
+
         }
 
         player1_keybinds = "\n".join([f"{action}: {key}" for action, key in user1.get_keyboard_keybinds().items()])
